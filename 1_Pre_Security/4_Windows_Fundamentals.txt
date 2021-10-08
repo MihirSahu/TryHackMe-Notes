@@ -1,0 +1,142 @@
+Windows Fundamentals
+*Pretty sure I know a good amount of this so I'll only take notes on stuff I don't know
+---------------------
+
+Windows Fundamentals 1
+
+	*The Run application allows us to run things quickly
+
+	The File System
+		The file system used for modern versions of Windows is NTFS (New technology file system)
+			Before NTFS was FAT16/FAT32 (now seen in usb devices, microsd, etc.) and HPFS
+			NTFS is a journaling file system; in the case of a failure the file system can automatically repair the folers/files on the disk using log files
+			NTFS can:
+				support files larger than 4gb
+				set specific permissions on folders and files
+				folder and file compression
+				Encryption
+		Permissions on NTFS
+			Full Control
+			Modify
+			Read and Execute
+			List folder contents
+			Read
+			Write
+		Alternate data streams (ADS) - allows files to contain more than one stream of data
+			Specific to NTFS
+			Windows explorer can't natively display ADS, but powershell can
+
+	The Windows\System32 folders
+		C:\Windows contains the operating system
+		system environment variables - variables that store information about os environment
+			System path, processors being used, location of temporary folders, etc.
+			Ex. system variable for the windows directory is %windir%
+	
+	User Accounts, Profiles, Permissions
+		Two types of user accounts: Administrator and Standard User
+			Administrator can make any changes to the system
+			Standard user can only make changes to folders/files attached to the user and can't perform system-level changes, like install programs
+		When a user account is created, a profile is created for the user at C:\Users
+		Access information about users by using "Local User and Group Management"
+			Use the Run application and type in "lusrmgr.msc"
+			Each groups has permissions set to it, if a user is added to a group they inherit the permissions
+		*For a given file/program right click -> properties to see permissions
+	
+	User Account Control (UAC)
+		Large majority of home users are logged into Windows as local admin
+			Can make changes to system
+			Risk of system compromise is high
+		User account control (UAC) - created to protect local user
+			When a user with the account type of administrator logs in to the system, the current session doesn'r run with elevated permissions
+				When an operation requiring higher-level priviledges needs to execute, the user will be prompted to confirm if they want it to run
+	
+	Task Manager
+		taskmgr
+		https://www.howtogeek.com/405806/windows-task-manager-the-complete-guide/
+
+Windows Fundamentals 2
+
+	*To view tools that can be used on computer go to System Configuration (msconfig)
+
+	System Configuration
+		System Configuration Utility (MSConfig) - for advanced troubleshooting, help diagnose startup issues
+			General
+			Boot
+			Services
+			Startup
+			Tools
+		Lots of tools that can give a lot of information about system
+	
+	Computer Management (compmgmt)
+		System tools
+			Task Scheduler
+			Event viewer
+			Shared folders
+			Local Users and Groups
+			Performance
+			Device manager
+		Storage
+			Windows server backup
+			Disk management
+		Services and Applications
+			Routing and remote access
+			Services
+			WMI control
+	
+	System Information (msinfo32)
+		system information - information about computer and displays comprehensive view of hardware, system components, and software environment
+			Hardware Resources
+			Components
+			Software Environment
+				Environment variables can be found in this section
+	
+	Resource Monitor (resmon)
+		Shows use of resources
+	
+	Command Prompt (cmd)
+		Use "<command> /?" or "<command> help" to get help for commands
+		whoami - see logged in user
+		hostname - output computer name
+		ipconfig - network address settings
+		cls - clear terminal
+		netstat - statistics about protocols and TCP/IP
+		net - manage network resources
+	
+	Registry Editor (regedit)
+		Central hierarchical database used to store information necessary to configure the system for one or more users, applications, and hardware devices
+
+Windows Fundamentals 3
+	Windows Update
+		Patch Tuesday - updates are released on the 2nd tuesday of every month
+		Can access windows update using "control /name Microsoft.WindowsUpdate"
+	
+	Windows Security
+		Virus and threat protection
+			Current threats - see device scan options and threat history here
+			Virus and threat protection settings - manage antivirus settings
+		Firewall and network protection
+		App and browser control
+		Device security
+		
+	Firewall and network protection
+		Domain - applies to networks where the host system ca nauthentiate to a domain controller
+		Private - user-assigned profile and is used to manage private or home networks
+		Public - used to manage public networks
+		To specify rules for firewall go to advanced settings
+	
+	App and Browser control
+		Microsoft defender smartscreen - protects against phishing or malware websites and apps
+	
+	Device security
+		Trusted Platform Module (TPM) - something security
+	
+	Bitlocker - encrypts data and drives
+		Works best when TPM is installed
+	
+	Volume shadow copy service (VSS)
+		Creates a shadow copy (a snapshot) of the data that needs to be backed up
+		If VSS is enabled you can manage shadow volumes from advanced system settings
+		Ransomware malware writers delete shadow copies so it's not possible to recover from attack
+	
+	Living off the land - attackers use built-in windows tools and utilities to go undetected in the victom environment
+

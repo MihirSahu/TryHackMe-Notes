@@ -1,0 +1,12 @@
+Search engines are indexers of information of content in the world wide web
+
+Crawlers/spiders - search/index for content in the WWW
+	Discover content (such as keywords) through
+		1. Pure discovery - url is visited and info about the website is returned to the search engine
+		2. Previously discovered websits - visit urls that have already been discovered
+		Want to spread to everything it can (like a virus)
+	
+	If a website "mywebsite.com" has words apple, pear, and babana, these words are stored in a dictionary by the crawler and returned to the search engine
+		When a user searches for those words then the website appears
+	If "mywebsite.com" has links to other website "anotherwebsite.com" then the crawler will traverse that entire website and retieve it's contents
+		Then all contents are returned to search engine

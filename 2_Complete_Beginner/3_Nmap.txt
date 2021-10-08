@@ -1,0 +1,112 @@
+Nmap
+-----
+
+*****See nmap man pages and websites if you have any questions
+
+Knowledge is power
+Port scanning - learn "landscape" of IP address and see which services are running on which devices
+	When a network service is run it opens a port to receive the conncetion
+	Ports are necessary for making multiple network requests
+	Network connections are made between 2 ports
+	If we don't know which ports are open then we can't sucessfully attack the target, so we always begin with a port scan
+
+	Overview
+		3 basic types of scans
+			TCP connect scans (-sT)
+			SYN "Half-open" scans (-sS)
+			UDP scans (-sU)
+
+		Less common scans
+			TCP null scans (-sN)
+			TCP FIN scans (-sF)
+			TCP Xmas scans (-sX)
+
+		Use -p to specify port(s)
+		*Always use -vv to increase verbosity
+
+	TCP Connect Scans
+		TCP connect scan performs the 3 way handshake with each target port and determines if service is open based on response
+			If packet with RST flag is sent back, port is closed
+			If packet with SYN/ACK then open
+			If no response, probably guarded by firewall (considered to be filtered), because most firewalls are configured to drop packets
+		Firewall can be configured to respond with a RST instead of dropping to packet to confuse attackers
+			iptables -I INPUT -p tcp --dport <port> -j REJECT --reject-with tcp-reset
+		
+	SYN "half-open" "stealth" Scans
+		SYN scans are used to scan ports like the TCP connect scan but while TCP connect scans perform a full 3 way handshake with the target, SYN scans send a RST tcp packet after receiving a SYN/ACK from the target
+		Advantages:
+			1. Can be used to bypass intrusion detection systems because they're looking for a full 3 way handshake
+			2. SYN scans are not often logged by applications listening on open ports, standard practice is to log a connection once it's fully established
+			3. SYN scans are faster than TCP connect scans because they require less steps
+		Disadvantages:
+			1. Require sudo permissions in Linux because they require the ability to create raw packets as opposed to a full TCP handshake
+			2. Unstable services can be brought down by SYN scans
+
+		If nmap is run without sudo perms it defaults to TCP connect scans, if run with sudo it defaults to SYN scans
+
+		The process of identifying open/closed ports is same as TCP connect scans
+	
+	UDP Scans
+		UDP doesn't use a handshake, rely on sending packets and hoping they make it
+		When a packet is sent using UDP successfully, there should be no response
+			If this happens, nmap refers to the port as bring open|filtered
+		If the packet is sent to a closed port, the target should respond with an ICMP (ping) packet saying that the port is unreachable
+		UDP scans are slow, so it's good practice to run an nmap scan with --top-ports <number> enabled with a UDP scan
+		UDP scans usually send empty UDP packets, but if it sends a packet to a port that usually occupies a well-known service it will send protocol-specifc payloads to get a better result
+	
+	NULL, FIN, and Xmas Scans
+		These are more stealthy that SYN scans, used for firewall evasion
+		NULL scan - TCP request is sent with no flags set
+		FUN scan - TCP request sent with FIN flag set
+		Xmas scan - sends a malformed TCP packet; sets FIN, PSH, and URG flags
+			Many devices respond with a RST to any malformed TCP packet, regardless of if port is open or not to confuse
+
+		Target should respond with RST if port is closed
+		Expected response for open ports is same as that of UDP scan
+
+		Many firewalls drop incoming TCP packets that have SYN flag set; by sending requests that don't contain SYN the firewall can be bypassed
+			Most modern firewalls can detect this
+	
+	ICMP Network Scanning
+		ping sweep - send an ICMP packet to each possible IP address on the network
+			If there's a response, that IP address is 'alive'
+		"nmap -sn 192.168.0.1-254" or "nmap -sn 192.168.0.0/24" <- this is CIDR notation
+		-sn doesn't scan any ports, forcing it to use ICMP echo packets or ARP requests
+	
+	Nmap Scripting Engine (NSE)
+		Written in lua
+		Adds more functionality to nmap
+
+		There are many categories available. Some useful categories include:
+			safe:- Won't affect the target
+			intrusive:- Not safe: likely to affect the target
+			vuln:- Scan for vulnerabilities
+			exploit:- Attempt to exploit a vulnerability
+			auth:- Attempt to bypass authentication for running services (e.g. Log into an FTP server anonymously)
+			brute:- Attempt to bruteforce credentials for running services
+			discovery:- Attempt to query running services for further information about the network (e.g. query an SNMP server).
+
+		--script <script name> or --script <script name>,<script name>...
+		When --script is used it runs any applicable scripts against the target
+		--script-args <arguments>
+		Ex. nmap -p 80 --script http-put --script-args http-put.url='/dav/shell.php',http-put.file='./shell.php'
+		--script-help <script name> for help on script
+
+		To see how script works look in script code
+
+		To find scripts:
+			1. Look through /usr/share/nmap/scripts/script.db and /usr/share/nmap/scripts/
+			2. Go on nmap website
+
+		To install new scripts:
+			1. Download script to scripts folder "sudo wget -O /usr/share/nmap/scripts/<script-name>.nse https://svn.nmap.org/nmap/scripts/<script-name>.nse"
+			2. Update nmap database "nmap --script-updatedb"
+	
+	Firewall Evasion
+		Typical windows will block all ICMP packets
+			Use -Pn to not bother pinging the host before scanning it
+		Firewall evasion switches:
+			-f: Fragment the packets, making it less likely that the packets wil be detected by firewall or IDS
+				--mtu <number>: alternative to -f, specify size of packets
+			--scan-delay <time>ms: Add delay between packets sent. Useful if network is unstable or evading time based firewall/IDS triggers
+			--badsum: Generate invalid checksum for packets

@@ -1,0 +1,219 @@
+How the Web Works
+------------------
+
+DNS in Detail
+	DNS (Domain Name System) - provides a simple way to communicate with devices without remembering their IP addresses
+		Each computer on the internet has its own ip address; when visiting a website you can use the IP address of the device it's hosted on or it's domain name
+	
+	Domain Hierarchy
+	TLD (Top Level Domain) - most righthand part of a domain name (ex. .com, .org, .ca, .co.uk)
+		Two types of TLD:
+			gTLD - tells user about purpose of domain name (.com = commercial, .org = organization)
+			ccTLD - tells user about geographic location (.ca = canada, .co.uk = United Kingdom)
+	Second Level Domain - part of domain name before TLD (ex. second level domain for tryhackme.com is tryhackme)
+		Limited to 63 characters + TLD and can only use a-z, 0-9, and hyphens
+	Subdomain - part of domain name before Second level domain (ex. subdomain in admin.tryhackme.com is admin)
+		Same creation restrictions as Second level domains
+		Multiple subdomains can be added together to create longer domain names, but length must be less than 253
+		No limit to the number of subdomains that can be created
+
+	Record Types
+		Dns isn't just for websites
+		Multiple types of dns record:
+			A Record - records resolve to ipv4 addresses
+			AAAA Record - resolve to ipv6 addresses
+			CNAME Record - resolve to another domain name
+			MX Record - resolve to the address of the servers that handle the email for the domain being queried
+			TXT Record - free text fields where any text based data can be stored
+	
+	Making a Request
+		When a DNS request is made:
+			1. When you request a domain name, the computer checks the local cache to see if website is stored in it. If not, a request to Recursive dns server is made
+			2. Recursive dns server is usually provided by ISP, but you can choose your own. This server has a cache of most commonly visited websites; if not found, a request is made to internet's root dns servers
+			3. Root servers act as backbone of the internet; they redirect you to the top level domain dns servers (.com, .org, etc.) depending on the request
+			4. The TLD dns servers hold the records to find the authoritative servers (also known as the nameserver for the domain; there are multiple nameservers for a domain to act as a backup if one fails)
+			5. The authoritative dns server is the server responsible for storing dns records for a particular domain name. The record for the website you're searching for is sent back to the recursive dns server, where a local copy is cached for future reference, and then is sent to the original client that made the request.
+				dns records all come with a TTL (time to live) value, which is the number of seconds that the response should be saved locally for until you have to look it up again
+				caching saves on having to make a dns request every time you connect to a server
+		Use the nslookup tool to see dns records of websites
+
+Http in Detail
+	Http (htpertext transfer protocol) - set of rules used for communication with web server for transmitting webpage data
+		Created by Tim Berners-Lee and team
+	Https (hypertext transfer protocol secure) - secure version of http; data is encrypted and gives assurances that you're talking to the correct web server
+
+	Requests and Responses
+		To access a website a browser will need to make requests to a web server for content; URLs are needed to know exactly where to find the content
+		URL (universal resource locater) - an instruction on how to access a resource on the internet
+			Possible features of url (not all features are used in every request)
+				http://		user:password	@tryhackme.com:		80	/view-room	?id=1		#task3
+				Scheme		User		Host/Domain		Port	Path		Query String	Fragment
+
+			Scheme: This instructs on what protocol to use for accessing the resource such as HTTP, HTTPS, FTP (File Transfer Protocol).
+			User: Some services require authentication to log in, you can put a username and password into the URL to log in.
+			Host: The domain name or IP address of the server you wish to access.
+			Port: The Port that you are going to connect to, usually 80 for HTTP and 443 for HTTPS, but this can be hosted on any port between 1 - 65535.
+			Path: The file name or location of the resource you are trying to access.
+			Query String: Extra bits of information that can be sent to the requested path. For example, /blog?id=1 would tell the blog path that you wish to receive the blog article with the id of 1.
+			Fragment: This is a reference to a location on the actual page requested. This is commonly used for pages with long content and can have a certain part of the page directly linked to it, so it is viewable to the user as soon as they access the page.
+
+		Making a request
+			headers - data send with a get request to web servers with extra information
+			Example request:
+				GET / HTTP/1.1
+				Host: tryhackme.com
+				User-Agent: Mozilla/5.0 Firefox/87.0
+				Referer: https://tryhackme.com/
+			Line 1: This request is sending the GET method ( more on this in the HTTP Methods task ), request the home page with / and telling the web server we are using HTTP protocol version 1.1.
+			Line 2: We tell the web server we want the website tryhackme.com
+			Line 3: We tell the web server we are using the Firefox version 87 Browser
+			Line 4: We are telling the web server that the web page that referred us to this one is https://tryhackme.com
+			Line 5: HTTP requests always end with a blank line to inform the web server that the request has finished.
+
+			Example response:
+				HTTP/1.1 200 OK
+				Server: nginx/1.15.8
+				Date: Fri, 09 Apr 2021 13:34:03 GMT
+				Content-Type: text/html
+				Content-Length: 98
+
+				<html>
+				<head>
+				    <title>TryHackMe</title>
+				</head>
+				    <body>
+				        Welcome To TryHackMe.com
+					</body>
+				</html>
+			Line 1: HTTP 1.1 is the version of the HTTP protocol the server is using and then followed by the HTTP Status Code in this case "200 Ok" which tells us the request has completed successfully.
+			Line 2: This tells us the web server software and version number.
+			Line 3: The current date, time and timezone of the web server.
+			Line 4: The Content-Type header tells the client what sort of information is going to be sent, such as HTML, images, videos, pdf, XML.
+			Line 5: Content-Length tells the client how long the response is, this way we can confirm no data is missing.
+			Line 6: HTTP response contains a blank line to confirm the end of the HTTP response.
+			Lines 7-14: The information that has been requested, in this instance the homepage.
+
+		Content methods
+			methods - a way for client to show their intended action when making an HTTP request
+				GET request - get information from web server
+				POST request - submit data to web server and potentially create new records
+				PUT request - submit data to web server and update information
+				DELETE request - delete info/records from web server
+
+		HTTP Status Codes
+			When an HTTP server responds it's first line contains the status code, which tells the client of the outcome of the request and how to handle it
+			Status code ranges:
+				100-199 - Information Response		These are sent to tell the client the first part of their request has been accepted and they should continue sending the rest of their request. These codes are no longer very common.
+				200-299 - Success			This range of status codes is used to tell the client their request was successful.
+				300-399 - Redirection			These are used to redirect the client's request to another resource. This can be either to a different webpage or a different website altogether.
+				400-499 - Client Errors			Used to inform the client that there was an error with their request.
+				500-599 - Server Errors			This is reserved for errors happening on the server-side and usually indicate quite a major problem with the server handling the request.
+
+			Common status codes:
+				200 - OK			The request was completed successfully.
+				201 - Created			A resource has been created (for example a new user or new blog post).
+				301 - Permanent Redirect	This redirects the client's browser to a new webpage or tells search engines that the page has moved somewhere else and to look there instead.
+				302 - Temporary Redirect	Similar to the above permanent redirect, but as the name suggests, this is only a temporary change and it may change again in the near future.
+				400 - Bad Request		This tells the browser that something was either wrong or missing in their request. This could sometimes be used if the web server resource that is being requested expected a certain parameter that the client didn't send.
+				401 - Not Authorised		You are not currently allowed to view this resource until you have authorised with the web application, most commonly with a username and password.
+				403 - Forbidden			You do not have permission to view this resource whether you are logged in or not.
+				405 - Method Not Allowed	The resource does not allow this method request, for example, you send a GET request to the resource /create-account when it was expecting a POST request instead.
+				404 - Page Not Found		The page/resource you requested does not exist.
+				500 - Internal Service Error	The server has encountered some kind of error with your request that it doesn't know how to handle properly.
+				503 - Service Unavailable	This server cannot handle your request as it's either overloaded or down for maintenance.
+
+		Headers
+			Common Request Headers
+				These are headers that are sent from the client (usually your browser) to the server.
+
+				Host: Some web servers host multiple websites so by providing the host headers you can tell it which one you require, otherwise you'll just receive the default website for the server.
+				User-Agent: This is your browser software and version number, telling the web server your browser software helps it format the website properly for your browser and also some elements of HTML, JavaScript and CSS are only available in certain browsers.
+				Content-Length: When sending data to a web server such as in a form, the content length tells the web server how much data to expect in the web request. This way the server can ensure it isn't missing any data.
+				Accept-Encoding: Tells the web server what types of compression methods the browser supports so the data can be made smaller for transmitting over the internet.
+				Cookie: Data sent to the server to help remember your information (see cookies task for more information).
+
+			Common Response Headers
+				These are the headers that are returned to the client from the server after a request.
+
+				Set-Cookie: Information to store which gets sent back to the web server on each request (see cookies task for more information).
+				Cache-Control: How long to store the content of the response in the browser's cache before it requests it again.
+				Content-Type: This tells the client what type of data is being returned, i.e., HTML, CSS, JavaScript, Images, PDF, Video, etc. Using the content-type header the browser then knows how to process the data.
+				Content-Encoding: What method has been used to compress the data to make it smaller when sending it over the internet.
+
+			Cookies
+				cookies - small piece of data stored on computer
+				Saved when "set-cookie" header is received from a web server response, and is sent back whenever you make other requests
+				Used to remind web server who you are, personal settings, etc.
+
+How Websites Work
+	2 major components that make up a websote:
+		Front end (client-side) - how a browser renders a website
+			Everything you can see on the browser is the front end
+		Back end (server-side) - a server that processes your request and returns a response
+	
+	HTML (section contains basic info that I already know so I'll refrain from adding it)
+		Websites are created using html, css, and js
+	
+	Sensitive Data Exposure
+		Website may not protect sensitive data on front end of website, can be used for malicious purposes
+		When testing security, always review page source code to look for exposed login credentials or hidden links
+	
+	HTML Injection
+		Vulnerability when website fails to filter user input that is displayed on the page
+			This could allow arbitrary code execution
+		NEVER TRUST USER INPUT!
+			Always sanitise everything the user enters before using it in a JS function
+
+Putting it All Together
+	Components
+		Load balancers
+			Ensure high traffic websites can handle the load and provide a failover if a server becomes unresponsive
+			When you make a request to a website with a load balancer, it will receive your request and then forward it to one of the multiple servers behind it
+			Uses different algorighms to decide which server is best suited for request
+				round-robin algorithm - sends to each server in turn
+				weighted - checks how many requests each server has and sends it to the least busy server
+			Health check - periodic checks with each server to ensure they're working correctly
+		CDN (Content Delivery Networks) - allows you to host static files from your website and host them across thousands of servers around the world
+			When a user requests a hosted file the CDN checks where the nearest server is located and sends the request there
+		Databases
+			Webservers communicate with databases to store and get data from them
+			Few databases:
+				MySQL
+				MSSQL
+				MongoDB
+				GraphQL
+				Postgres
+		WAF (web application firewall)
+			Located between web request and web server
+			Checks if excessive amount of web requests are being send by using rate limiting
+			Prevents hacking and DOS attacks
+
+How Web Servers Work
+	Web server - software that listens for incoming connections and uses the HTTP protocol to deliver web content to clients
+	Popular web server software: apache, nginx, ISS, NodeJS
+	Web servers deliver files from the root directory
+
+	Virtual Hosts
+		Web servers can host multiple websites with different domain names by using virtual hosts
+		Web server checks the hostname being requested from the HTTP headers and matches it against its virtual hosts
+			If match is found, the corrent website is provided, if not, then the default website it provided
+	
+	Static vs Dynamic Content
+		Static content - content that never changes
+			Pictures, javascript, css, html
+			Are directly served from the webserver with no changes made to them
+		Dynamic content - content that could change with different requests
+			Ex. Blog updated with new entery, search page, etc.
+
+Overview of how it all works
+1. Request tryhackme.com in browser
+2. Check Local Cache for IP address
+3. Check your recursive DNS server for address
+4. Query root server to find authoritative DNS server
+5. Authoritative DNS server advises the IP address for the website
+6. Request passed through a web application firewall (WAF)
+7. Request passes through a load balancer
+8. Connect to webserver on port 80 or 443
+9. Web server receives the GET request
+10. Web application talks to database
+11. Your browser renders the HTML into a viewable website

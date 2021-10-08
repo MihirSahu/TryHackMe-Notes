@@ -1,0 +1,26 @@
+* I'm pretty sure I already know all this stuff so I won't do extensive note taking, but I will add anything I need a refresher on or something that I didn't originally know
+
+SSH (secure shell)
+	Connect to remote machines securely
+	ssh <username to log in as>@<ip address of remote computer>
+
+SCP (secure copy)
+	Copy resources from/to remote machines
+	Copy to remote machine: scp <local file> <username to log in as>@<ip address of remote computer>:<path to new file>
+	Copy from remote machine: scp <username to log in as>@<ip address of remote computer>:<path to new file> <local file>
+
+Web server using python
+	python3 -m http.server
+	Then use browser or wget to navigate to the web server at <web server ip address>:<port> and download files
+
+Processes
+	To run commands one after the other use "&&"
+	To run a command in the background use the "&" at the end of the line
+	To pause a process use ctrl+z
+	To bring a process back to the foreground use the fg command
+	Use "systemctl <option> <service name>" to manage processes/services
+		options:
+			start - start the service
+			stop - stop the service
+			enable - start service at system boot
+			disable - don't start service at system boot

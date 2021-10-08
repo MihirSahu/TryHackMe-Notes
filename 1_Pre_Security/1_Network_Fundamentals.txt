@@ -1,0 +1,248 @@
+Complete Beginner -> Offensive pentesting or cyber defense
+
+Network Fundamentals
+---------------------
+
+Basic Networking
+	2 types of networks
+		Public/private networks
+	Make devices identifiably on a network
+		IP address (internet protocol) - can change from device to device but cannot be active more than once in the same network
+			2 types: public ip and private ip. Public ip addresses can be given by ISP
+			ipv4 is made of 4 sections called octets
+			ipv6 supports more addresses than ipv4
+		MAC address (media access control) - address embedded in networking hardware (specifically the NIC (Network Interface Card)) of device, first 6 characters represent the company that created device, last six are unique
+			Are embedded into hardware, can't be changed but can be spoofed and pretend to be another device in a network
+			**This is the address that is actually used to identify where to send data on a network
+	Ping is a fundamental network tool, uses ICMP (internet control message protocol)
+		Determines strength of connection between devices
+		"ping <ip address or website url>"
+
+LAN (Local area network)
+	Different topologies
+		Star - devices individually connected via central networking device like switch or hub, expensive to set up and maintain
+			If centralized device fails, entire network goes down
+		Bus - like stem and leaves of tree, prone to bottlenecks but is cost efficient to set up
+		Ring - devices connected to other devices on network, if one device goes down, entire network goes down
+	Router - connects networks and finds best path to passe data through them (it 'routes' data using the IP protocol)
+		Useful when devices are connected through many paths
+	Switch - aggregate multiple network-capable devices using ethernet, found in large networks where there are many devices to connect
+		Unlike routers switches use packet switching to break pieces of data into smaller chunks called packets
+	Routers and switches can connect to each other to increase reliability of network
+
+	Subnetting - splitting up a network into smaller networks, each for different purposes (ex. accounting, hr, finance); offer efficiency, security, and control
+		Achieved by splitting the number of hosts that can fit in a network, represented by a subnet mask
+			Subnet mask is structrured like an ip address; 4 octets, and each octet has a range from 0-255
+		Subnets use IP addresses in 3 ways
+			1. network address - identifies the start of the network and is used to verify network's existence
+			2. host address - ip address of a device on the network
+			3. default gateway - ip address assigned to a device capable of sending information to another network (router)
+		Small networks such as home networks use only one subnet
+	
+	ARP Protocol (address resolution protocol) - allows devices to identify themselves on a network; allows a device to associate its MAC address with an IP address on the network
+		Each device keeps a log/ledger (called a cache) of the MAC addresses of devices in the network
+		To map IP address and MAC address together ARP protocol sends 2 types of messages:
+			1. ARP Request - sends broadcast to every device on network by the requesting device, asking if any of the devices' MAC addresses matches up with the requested IP address
+			2. ARP Reply - reply sent back to requesting device if the MAC address matches requested IP address, then the requesting device logs this in cache
+	
+	DHCP protocol (Dynamic Host Configuration Protocol) - IP addresses can be assigned manually by entering physically into device or automatically using DHCP
+		1. When device connects to network and hasn't already been manually assigned an IP address it sends out a request (DHCP discover) to see if any DHCP servers are on the network
+		2. DHCP server replies back with an IP address the device can use (DHCP offer)
+		3. The device then sends a reply confirming it wants the offered IP address (DHCP request)
+		4. The DHCP server sends a reply acknowledging this has been completed, and the device can start using the IP address (DHCP ACK)
+		This 4 step process is called DORA
+	
+OSI Model (Open Systems Interconnection) - dictates how all networked devices will send, recieve, and interpret data
+	Devices can have different functions while communicating with other devices
+	Consists of 7 layers, each of which have different processes and add different pieces of info to data
+	encapsulation - processes and addition of info to data
+
+	Imagine that a computer wants to share data with another computer
+
+	7. Application
+		Layer in which protocols and rules determine how the USER should interact with data sent or received. Users often communicate with apps through gui (ex. outlook email client)
+	6. Presentation
+		Standardizes data to and from application layer. Two different email clients will have different structures, but data (content of email) will still display the same
+		Security features like data encryption (HTTPS) happen at this layer
+	5. Session
+		Once data is formatted in presentation layer a connection is created (and thus a session) to the computer that the data is meant for
+		Syncs the two computers and sends small chunks of the data (packets) to other computer
+	4. Transport
+		When data is sent between devices, it uses one of two protols
+			TCP (transmission control protocol) - reserves constant connection between the devices for the amount of time it takes for data to be sent/received, is designed for reliability
+				Is connection oriented
+				Uses error checking: guarantees that packets sent in session layer are received and reassembled in right order
+
+				Advantages of TCP
+				Guarantees the accuracy of data.
+				Capable of synchronising two devices to prevent each other from being flooded with data.
+				Performs a lot more processes for reliability.
+				
+				Disadvantages of TCP
+				Requires a reliable connection between the two devices. If one small chunk of data is not received, then the entire chunk of data cannot be used.
+				A slow connection can bottleneck another device as the connection will be reserved on the receiving computer the whole time.
+				TCP is significantly slower than UDP because more work has to be done by the devices using this protocol.
+
+			UDP (user datagram protocol)
+				Not connection oriented
+				No error checking, not much reliability, no sync of devices
+				Doesn't care if data is received by other device
+
+				Advantages of UDP	
+				UDP is much faster than TCP.
+				UDP leaves the application layer (user software) to decide if there is any control over how quickly packets are sent.
+				It is quite flexible to software developers in this sense.
+				
+				Disadvantages of UDP
+				UDP doesn't care if the data is received.
+				UDP does not reserve a continuous connection on a device as TCP does.
+				This means that unstable connections result in a terrible experience for the user.
+
+				Useful for situations where small pieces of data are being sent (ex. online multiplayer gaming)
+	3. Network
+		Routing (finding optimal path data should take to reach device) and reassembly of packets of data that were received
+		Routing protols - use factors like distance, reliability, and physical connection speed
+			OSPF (Open Shortest Path First)
+			RIP (Routing Information Protocol)
+		Devices capable of delivering packets using IP addresses are know as layer 3 devices (ex. routers)
+	2. Data link
+		Focuses of physical addressing and presents data in a format suitable for transmission (ex. arp protocol, frames)
+		Receives packets from network layer - including ip address for the remote computer - and adds the MAC address of receiving endpoint
+	1. Physical
+		References the physical components of hardware and uses electric signals to transfer data in a binary numbering system (ex. ethernet cables)
+
+Packets and Frames
+
+	encapsulation - processes and addition of info to data
+
+	As data is passed down each layer of the OSI model, more information containing details specific to each layer is added onto the transmission
+		Ex. Network layer would include source and destination IP addresses
+		Ex. Transportation layer would include information specific to protocol being used
+		The data link layer adds a piece on end of transmission so the data can't be intercepted and tampered with without breaking the trailer
+
+	Packets - broken up chunks of data that are reassembled when they reach destination, used to lower chance of bottleneck
+		Packets using the IP protocol have a set of headers that contain info about packet
+			1. Time to live - expiry timer for packet to not clog up network
+			2. checksum - integrity checking for TCP/IP
+			3. Source address - IP address of device that sent packet
+			4. Destination address - IP address of destination device
+	Frames - pieces of data that don't use IP protocol (so basically just packets without any ip data)
+
+	TCP (Transmission Control Protocol)
+		Consists of 4 layers
+			1. Application
+			2. Transport
+			3. Internet
+			4. Network Interface
+		Connection based - must establish connection and sync client and device before data is sent
+			This process is called the three way handshake
+		TCP packets contain many headers 
+			Header			Description
+			Source Port		This value is the port opened by the sender to send the TCP packet from. This value is chosen randomly (out of the ports from 0-65535 that aren't already in use at the time).
+			Destination Port	This value is the port number that an application or service is running on the remote host (the one receiving data); for example, a webserver running on port 80. Unlike the source port, this value is not chosen at random.
+			Source IP		This is the IP address of the device that is sending the packet.
+			Destination IP		This is the IP address of the device that the packet is destined for.
+			Sequence Number		When a connection occurs, the first piece of data transmitted is given a random number. We'll explain this more in-depth further on.
+			Acknowledgement 	Number	After a piece of data has been given a sequence number, the number for the next piece of data will have the sequence number + 1. We'll also explain this more in-depth further on.
+			Checksum		This value is what gives TCP integrity. A mathematical calculation is made where the output is remembered. When the receiving device performs the mathematical calculation, the data must be corrupt if the output is different from what was sent.
+			Data			This header is where the data, i.e. bytes of a file that is being transmitted, is stored.
+			Flag			This header determines how the packet should be handled by either device during the handshake process. Specific flags will determine specific behaviours, which is what we'll come on to explain below.
+		Messages used by TCP
+			Step	Message	Description
+			1	SYN	A SYN message is the initial packet sent by a client during the handshake. This packet is used to initiate a connection and synchronise the two devices together (we'll explain this further later on).
+			2	SYN/ACK	This packet is sent by the receiving device (server) to acknowledge the synchronisation attempt from the client.
+			3	ACK	The acknowledgement packet can be used by either the client or server to acknowledge that a series of messages/packets have been successfully received.
+			4	DATA	Once a connection has been established, data (such as bytes of a file) is sent via the "DATA" message.
+			5	FIN	This packet is used to cleanly (properly) close the connection after it has been complete.
+			#	RST	This packet abruptly ends all communication. This is the last resort and indicates there was some problem during the process. For example, if the service or application is not working correctly, or the system has faults such as low resources. 
+		Example three way handshake
+			Alice		Bob
+			SYN ->
+					<- SYN/ACK
+			ACK ->
+		Example closing a connection
+			Alice		Bob
+			FIN ->
+					<- ACK/FIN
+			ACK ->
+	
+	UDP (User Datagram Protocol)
+		stateless - doesn't require constant connection for data to be sent
+			3 way handshake doesn't occur, no sync
+		No regard to whether data reached safely, and no safeguards
+		Messages used by UDP
+			Header			Description
+			Time to Live (TTL)	This field sets an expiry timer for the packet, so it doesn't clog up your network if it never manages to reach a host or escape!
+			Source Address		The IP address of the device that the packet is being sent from, so that data knows where to return to.
+			Destination Address	The device's IP address the packet is being sent to so that data knows where to travel next.
+			Source Port		This value is the port that is opened by the sender to send the TCP packet from. This value is chosen randomly (out of the ports from 0-65535 that aren't already in use at the time).
+			Destination Port	This value is the port number that an application or service is running on the remote host (the one receiving data); for example, a webserver running on port 80. Unlike the source port, this value is not chosen at random.
+			Data			This header is where the data, i.e. bytes of a file that is being transmitted, is stored.
+		Example UDP connection
+			Alice		Bob
+					<- Request
+			Response ->
+			Response ->
+			Response ->
+	
+	Ports
+		ports - places where data is exchanged
+			Can range from 0-65535
+				Common ports - ports ranging from 0-1024
+			Each port can have diffent rules about which type of data can pass through
+			Specific ports are used for certain applications
+				Protocol					Port Number	Description
+				File Transfer Protocol (FTP)			21		This protocol is used by a file-sharing application built on a client-server model, meaning you can download files from a central location.
+				Secure Shell (SSH)				22		This protocol is used to securely login to systems via a text-based interface for management.
+				HyperText Transfer Protocol (HTTP)		80		This protocol powers the World Wide Web (WWW)! Your browser uses this to download text, images and videos of web pages.
+				HyperText Transfer Protocol Secure (HTTPS)	443		This protocol does the exact same as above; however, securely using encryption.
+				Server Message Block (SMB)			445		This protocol is similar to the File Transfer Protocol (FTP); however, as well as files, SMB allows you to share devices like printers.
+				Remote Desktop Protocol (RDP)			3389		This protocol is a secure means of logging in to a system using a visual desktop interface (as opposed to the text-based limitations of the SSH protocol).
+
+				Port 80 is used by web browsers/web servers
+				These ports are the default ports used by the applications, but they can be used with other ports too
+					To use arbitrary port use :<port>
+
+Extending your Network
+
+	port forwarding - essential feature to share data with devices outside of local network and through the internet
+		port forwarding opens specific ports
+		Without port forwarding devices would only be available to devices within the same direct network
+		Routers are used to configure port forwarding
+
+	firewall - device within network that determines what traffic is allowed to enter and exit
+		Can accept/deny based on port, protocol, and destination
+			Perform packet inspection to determine these factors
+		2 primary types of firewalls:
+			Stateful - rather that inspecting individual packet, firewall determines behavior of device based on entire connection
+				Consumes many resources because decision making is dynamic
+				If connection for a host is bad, it will block the entire device
+			Stateless - uses static set of rules to determine whether individual packets are acceptable or not
+				Use fewer resources, but are not dynamic and therefore not as effective as stateful firewalls
+				Great when receiving large amounts of traffic from a set of hosts (like DDOS attack)
+		Operate at layers 3 and 4 depending on the type of firewall
+	
+	VPN (Virtual Private Network) - technology that allows separate networks to communicate securely by creating a dedicated path between each other over the internet (known as a tunnel). Devices that connect with a tunnel for their own private network
+		Benefit									Description
+			Allows networks in different geographical locations to be connected.	For example, a business with multiple offices will find VPNs beneficial, as it means that resources like servers/infrastructure can be accessed from another office.
+	
+			Offers privacy.								VPN technology uses encryption to protect data. This means that it can only be understood between the devices it was being sent from and is destined for, meaning the data isn't vulnerable to sniffing. This encryption is useful in places with public WiFi, where no encryption provided by the network. You can use a VPN to protect your traffic from being viewed by other people.
+	
+			Offers Anonyminity.							Journalists and activists depend upon VPNs to safely report on global issues in countries where freedom of speech is controlled. Usually, your traffic can be viewed by your ISP and other intermediaries and therefore tracked. The level of anonymity a VPN provides is only as much as how other devices on the network respect privacy.. For example, a VPN that logs all of your data/history is essentially the same as not using a VPN in this regard.
+	
+		Types of Vpn technology
+			1. PPP
+			2. PPTP
+			3. IPSec
+
+	LAN Networking Devices
+		Router - device that connects networks and passes data between them
+			Routing - process of data travelling across networks
+			Operate at layer 3 of osi
+			Useful when devices are connected by many paths, and routers find the optimal path
+		Switch - device that can connect many devices (from 3-63) using ethernet cables
+			Operate at layer 2 of osi
+			Forward frames (doesn't use)
+			Advanced switches operate at layer 3 of the osi and can do some of the things routers can
+				VLAN (virtual local area network) - split up specific devices virtually
+					This is like subnetting but with switches instead of routers

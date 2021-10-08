@@ -1,0 +1,30 @@
+Complete Beginner Intro
+------------------------
+
+Introductory Researching
+	Ability to research effectively is the most important skill for a hacker
+	Hacking requires vast knowledge base, but nobody knows everything, there will always be a point when you need to look things up
+	
+	Example Research Question
+		Ex. you downloaded a jpeg image from a remote server, and you think something is hidden in it
+			1. Find out how it's done
+				Google "hiding information inside images"
+				Find that this technique is called "Steganography"
+			2. Find out how to use a tool to help you achieve your goal
+				Google "extract file from jpeg steganography"
+
+		Overall: If you have a question, search for the answer, and continue to query until you have a full understanding of the topic.
+			Start with a question, get an initial understanding of the topic, and then look into more advanced aspects as needed
+
+		There are no bad sources of information here; use whatever your can find
+
+Vulnerability Searching
+	When searching for vulnerabilities for a software, look at websites like
+		ExploitDB - useful for hackers because exploits can be downloaded and used out of the box
+			One of the first stops when you encounter software in a CTF
+			Kali linux comes with a tool called searchsploit which allows you to search ExploitDB
+		NVD
+		CVE Mitre
+	
+	CVE - common vulnerabilities and exposures
+		cve numbers identifies the vulnerabilities in the form CVE-YEAR-NUMBER
