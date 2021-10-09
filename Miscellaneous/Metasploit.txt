@@ -1,0 +1,87 @@
+These are notes from 2 different rooms: Metasploit: Introduction and Metasploit
+
+Metasploit: Introduction
+-------------------------
+Metasploit - supports all phases of a pen testing engagement, from info gatheing to post-exploitation
+2 main versions
+     Pro - commercial version, has a GUI
+     Framework - open source version that works from command line
+Main components
+     msfconsole - main command line interface
+     modules - supporting modules such as exploits, scanners, payloads, etc
+     tools - stand alone tools such as msfvenom, pattern_create, pattern_ofset
+
+Main components
+     Launch metasploit console using 'msfconsole'
+     Terms
+        Exploit - a piece of code that takes advantage of a vulnerability present on the target system
+            Basically the act of taking advantage of a vulnerability
+        Vulnerability - a design, coding, or logic flaw affecting the target system
+        Payload - the code that will run on the target system to achieve an attacker's goal
+     Module categories
+        Auxiliary - any supporting modules such as scanners, crawlers, and fuzzers
+        Encoders - allow you to encode the exploit and payload so that signature-based antiviruses may miss them
+            Signature based AVs have a database of known threats, and they compare sus files to the database
+            Should not be considered direct attemt to evade antivirus software
+        Evasion - will try to evade AV software
+        Exploits - a bunch of exploites organized by target system
+        NOPs (No OPeration) - do nothing, are used as buffers to achieve consistent payload sizes
+        Payloads - codes that run on target system
+            3 different types
+                Singles - self contained payloads that don't need to download other components to run
+                Stagers - set up connection channel between metasploit and target system
+                    First upload a stager on the target system and then download the rest of the payload
+                    Because of this the initial size of the payload is smaller
+                Stages - downloaded by the stager
+            If _ is used in the name of a payload, it's a single (inline) payload
+            If / is used, it's staged
+            Ex. generic/shell_reverse_tcp       This is single
+                windows/x64/shell/reverse_tcp   This is staged
+        Post - useful on the final stage of pen testing, the post-exploitation
+    All these files can be found in the /opt/metasploit-framework-xxxx/modules directory
+
+Msfconsole
+    Can be used just like a regular shell, and supports most linux commands
+    Use 'msfconsole -h' for help
+    Mfsconsole is managed by context; unless set as a global variable, settings will be lost if the module is changed
+    To use a module 'use <module name>'
+    See information about module by using 'info'
+        Can also use 'info <module name or path to module>'
+    Once a module is selected use 'show options'
+    Use 'set <option name> <value>' to set the value
+    Use 'unset <option name>' to unset a value and 'unset all' to unset all values
+    To see the available modules of a specific category use 'show <category>'
+    Leave the module by using 'back'
+    Use 'search <query>' to search the metasploit databse
+        Can use CVE numbers, exploit names, or taget system
+        Can use keywords 'search type:auxiliary telnet'
+    **Exploits take advantage of a vulnerability and may always show unexpected behavior
+
+Working with Modules
+    5 types of prompts
+        Regular command prompt (before using metasploit)
+        Metasploit command prompt - shows up when you enter msfconsole
+        Context prompt - shows up when you use a module
+        Meterpreter command prompt - shows up when a meterpreter (a specific payload) agent was loaded on the target system and connected back to you
+        Shell on target system - shows up when you access the target machine
+    Common parameters
+        RHOSTS: “Remote host”, the IP address of the target system. A single IP address or a network range can be set. This will support the CIDR (Classless Inter-Domain Routing) notation (/24, /16, etc.) or a network range (10.10.10.x – 10.10.10.y). You can also use a file where targets are listed, one target per line using file:/path/of/the/target_file.txt, as you can see below.
+        RPORT: “Remote port”, the port on the target system the vulnerable application is running on.
+        PAYLOAD: The payload you will use with the exploit.
+        LHOST: “Localhost”, the attacking machine (your AttackBox or Kali Linux) IP address.
+        LPORT: “Local port”, the port you will use for the reverse shell to connect back to. This is a port on your attacking machine, and you can set it to any port not used by any other application.
+        SESSION: Each connection established to the target system using Metasploit will have a session ID. You will use this with post-exploitation modules that will connect to the target system using an existing connection.
+    Use 'setg' and 'unsetg' to set global variables that can be used for all modules
+    Once all parameters (variables) are set, use 'exploit' to start the exploit
+    If vulernability was successfully exploited, a new session will be created
+         Use 'background' to background the session prompt and go back to msfconsole prompt
+    Use 'sessions' to see existing sessions
+    To interact with session, use 'session -i <session id>'
+
+
+Metasploit
+-----------
+    Use 'db_status' to check connection with database
+    Use 'help' when in msfconsole to see all commands
+    Use 'get' to see the value of set variables
+    Use 'spool' to save console output to file
