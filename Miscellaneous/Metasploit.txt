@@ -85,3 +85,5 @@ Metasploit
     Use 'help' when in msfconsole to see all commands
     Use 'get' to see the value of set variables
     Use 'spool' to save console output to file
+    Start nmap and add results to database immediately using 'db_nmap'
+        Database commands are available under the "Database Backend Commands" section of the help menu
