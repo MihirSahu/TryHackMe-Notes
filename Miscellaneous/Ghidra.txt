@@ -1,0 +1,24 @@
+Notes on the "CC: Ghidra" room
+
+Basics
+-------
+Create a project File > New Project > Non Shared Project
+Import a file you want, double click on it, and analyze it
+Symbol tree - displays all the files that were imported to create the binary and all the user created functions
+    Functions that start with "_" can be generally ignored becuase those are created during compilation
+Make sure to analyze both the high level code and the assembly, as both have unique information
+Google the assembly instructions if you have to
+
+Miscellaneous Operations
+-------------------------
+Patching Binaries - change the assembly instructions
+    1. Go to the section of the high level code you want to edit and view the corresponding assembly code
+    2. Right click on the assembly you want to patch and click "Patch Instruction"
+    3. Edit the assembly code and the changes will be reflected on the high level code
+    Useful for checking your work
+
+Searching
+    Ghidra can locate different portions of memory if given a memory address
+    Use "Navigation > Go To" and input a memory address
+
+Ghidra cheat sheet https://ghidra-sre.org/CheatSheet.html
