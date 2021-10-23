@@ -1,0 +1,31 @@
+In this task, we'll be learning the basics of reverse engineering and assembly. Here are some important things to do before starting the task:
+
+These files have been compiled with the lowest level of optimisation on Unix based machines and are intended to be run on Linux/Mac.
+Make sure you set up a debugger - it would be good to get comfortable with radare2 which can be downloaded from here. You can also use other debuggers like gdb, which come installed in most Unix based operating systems.
+When these files have been downloaded, change the permissions of these files using the command chmod +x filename
+These tasks will make use of crackme files. The objective of these files is to understand the assembly code to uncover the right password for the file.
+
+crackme1 - if statements and function calling
+crackme2 - registers and comparisons
+crackme3 - loops
+
+crackme1
+---------
+1. Open crackme1.bin in gdb with "gdb crackme1.bin"
+2. Disassemble the main function with "disas main"
+3. Study what's happening
+4. Check what's contained within each address with "x/s <address>"
+        0x000055555540078d <+35>:	mov    eax,DWORD PTR [rip+0x13d]        # 0x5555554008d0
+5. If we check what's in 0x5555554008d0 with "x/s 0x5555554008d0" we get '0x5555554008d0:	"hax0r"'
+
+crackme2
+---------
+1. Open crackme2.bin in gdb with "gdb crackme1.bin"
+2. Disassemble the main function with "disas main"
+3. Study what's happening
+4. We see that "0x0000555555400758 <+62>:	cmp    eax,0x137c" is comparing the value in eax to the hex value 0x137c
+        If false, it jumps and states states "password is valid"
+            0x000055555540075d <+67>:	jne    0x55555540076d <main+83>
+        If true, it goes on to say "password is valid", which we can view by using "x/s 0x55555540083b"
+            0x000055555540075f <+69>:	lea    rdi,[rip+0xd5]        # 0x55555540083b
+5. Therefore, 0x137c must be the password. Converted to decimal, it's 4988
