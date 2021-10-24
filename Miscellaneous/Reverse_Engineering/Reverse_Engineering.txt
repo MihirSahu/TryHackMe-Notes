@@ -29,3 +29,5 @@ crackme2
         If true, it goes on to say "password is valid", which we can view by using "x/s 0x55555540083b"
             0x000055555540075f <+69>:	lea    rdi,[rip+0xd5]        # 0x55555540083b
 5. Therefore, 0x137c must be the password. Converted to decimal, it's 4988
+
+https://cheahcheesam.medium.com/try-hack-me-reverse-engineering-writeup-f3866d564e2
