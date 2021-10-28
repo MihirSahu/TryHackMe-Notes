@@ -76,7 +76,8 @@ Working with Modules
     If vulernability was successfully exploited, a new session will be created
          Use 'background' to background the session prompt and go back to msfconsole prompt
     Use 'sessions' to see existing sessions
-    To interact with session, use 'session -i <session id>'
+    To interact with a session, use 'sessions -i <session id>'
+    If you want to switch shell to meterpreter once you have a session opened and send to the background use the shell_to_meterpreter module
 
 
 Metasploit
@@ -87,3 +88,5 @@ Metasploit
     Use 'spool' to save console output to file
     Start nmap and add results to database immediately using 'db_nmap'
         Database commands are available under the "Database Backend Commands" section of the help menu
+
+    Use the shell_to_meterpreter to conver shell from metasploit to meterpreter once you have a session opened and sent to the background

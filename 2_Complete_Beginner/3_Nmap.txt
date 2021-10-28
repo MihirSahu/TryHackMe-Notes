@@ -2,6 +2,7 @@ Nmap
 -----
 
 *****See nmap man pages and websites if you have any questions
+*Always use -vv to increase verbosity
 
 Knowledge is power
 Port scanning - learn "landscape" of IP address and see which services are running on which devices
@@ -85,6 +86,8 @@ Port scanning - learn "landscape" of IP address and see which services are runni
 			auth:- Attempt to bypass authentication for running services (e.g. Log into an FTP server anonymously)
 			brute:- Attempt to bruteforce credentials for running services
 			discovery:- Attempt to query running services for further information about the network (e.g. query an SNMP server).
+
+		To run a script against a whole category use "--script <category>"
 
 		--script <script name> or --script <script name>,<script name>...
 		When --script is used it runs any applicable scripts against the target
