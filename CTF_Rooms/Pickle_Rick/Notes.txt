@@ -1,0 +1,19 @@
+https://vivekanandagn.medium.com/pickle-rick-ctf-walkthrough-tryhackme-72885d554323
+
+Run nmap and we find that two ports are open: 22 for ssh and 80 for http
+If we access the web page with <ip address>:80 we see info, and if we inspect the source code we see that the username is R1ckRul3s
+If we try to ssh into the machine using "ssh R1ckRul3s@<ip address>" we get denied because it seems ssh is configured to use private/public key auth
+We then enumerate the web page using any tool to find other resources on the server
+    dirb
+    gobuster
+    dirbuster
+    nikto
+We find 2 important ones names "login.php" and "robots.txt"
+If we access robots.txt on the browser using <ip address>:80/robots.txt we see some text (Wubbalubbadubdub), and if we visit login.php we find a login screen
+If we use the username we found earlier and the text from robots.txt we come to a command panel
+Now we're free to explore the file system and find all the ingredients
+    NOTE: cat is blocked, but less works
+The files are located in
+    /var/html/www/Sup3rS3cretPickl3Ingred.txt
+    /home/rick/'second ingredients'
+    /root/3rd.txt
