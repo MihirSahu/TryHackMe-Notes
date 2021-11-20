@@ -5,7 +5,7 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 1. Scan ports with nmap: "sudo nmap -sS -A <target ip address>"
 - 2 ports open: 80 and 22, apache 2.4.29 and ssh respectively
 
-2. Find hidden directories (GoBuster recommended, but I used dirb) (make sure to use http, as the webpage uses http): "dirb http://<target ip address>"
+2. Find hidden directories (GoBuster recommended, but I used dirb) (make sure to use http, as the webpage uses http): "dirb http://```<target ip address>```"
 > -----------------
 >DIRB v2.22    
 >By The Dark Raver
@@ -49,11 +49,11 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 
 3. We can upload a payload and get a reverse shell. Download the file that's included with this writeup, extract the file, and change the port and ip to your machine's ip address and a port that's not being used.
 
-4. If we save this as a .php file and try to upload it, we find that we're allowed to upload .php files. There are several ways of bypassing this, but the easiest way is to just change the file extension so that it'll get accepted into the server and so that it'll run when we try to run it. For example, payload.jpg won't work because the .jpg won't run. So we bypass it by simple changing the extension to .php5, which is another version of php that is not blocked by the server. After uploading, go to "<target ip address>/uploads" - which we found earlier with dirb - and make sure that the file has been uploaded
+4. If we save this as a .php file and try to upload it, we find that we're allowed to upload .php files. There are several ways of bypassing this, but the easiest way is to just change the file extension so that it'll get accepted into the server and so that it'll run when we try to run it. For example, payload.jpg won't work because the .jpg won't run. So we bypass it by simple changing the extension to .php5, which is another version of php that is not blocked by the server. After uploading, go to "```<target ip address>```/uploads" - which we found earlier with dirb - and make sure that the file has been uploaded
 
-5. Now we set up nc to listen to the port we programmed the script to connect to: "nc -nlvp <port>"
+5. Now we set up nc to listen to the port we programmed the script to connect to: "nc -nlvp ```<port>```"
 
-6. Finally, we run the script on the web server with curl: "curl <target ip address>/uploads/<script name>", and we should now have access to the server through netcat
+6. Finally, we run the script on the web server with curl: "curl ```<target ip address>```/uploads/```<script name>```", and we should now have access to the server through netcat
 
 7. We're given the name of the file that contains the flag "user.txt", so we simple use the find command: "find / -type f -name user.txt" and we see that the file is at /var/www/user.txt and when we cat it we find that the flag is THM{y0u_g0t_a_sh3ll}
 
@@ -124,7 +124,7 @@ Great writeup: https://beginninghacking.net/2020/09/09/try-hack-me-rootme/
 >
 >print(os.listdir('/root'))
 
-13. I then uploaded that to the server and used "/usr/bin/python /var/www/html/uploads/<filename>", and I see that root.txt is indeed in /root
+13. I then uploaded that to the server and used "/usr/bin/python /var/www/html/uploads/```filename```", and I see that root.txt is indeed in /root
 
 14. Finally, to print out the contents of root.txt, I wrote this script
 >#!/usr/bin/python \
