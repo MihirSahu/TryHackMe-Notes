@@ -176,7 +176,7 @@
 >		}
 >	});
 >};
-4. Set up [Burpsuite](https://tryhackme.com/resources/blog/setting-up-burp) to be able to capture traffic. After setting it up, reload http://java.uploadvulns.thm and the traffic should be displayed in the Proxy > Intercept tab. The webpage should appear to be loading indefinitely. Right click > Do Intercept > Response to this request, and you'll be able to see the html code that the server sent us
+4. Set up [Burpsuite](https://tryhackme.com/resources/blog/setting-up-burp) to be able to capture traffic. After setting it up, reload http://java.uploadvulns.thm and the traffic should be displayed in the Proxy > Intercept tab. The webpage should appear to be loading indefinitely. Right click > Do Intercept > Response to this request, then click Forward, and you'll be able to see the html code that the server sent us
 5. Delete the script tag that links the 'client-side-filter.js' to the html
 6. Click Forward until the webpage finishes loading
 7. Now prepare the [Monkey Pentest Reverse Shell script](https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php) and upload it to the server. There should be no error because we removed the filtering restrictions
@@ -320,4 +320,6 @@
 >2021/11/30 06:23:22 Finished
 >===============================================================
 2. Look at the page source for the landing page and we see that the input accepts files with MIME type of "image/jpeg" `<input id="fileSelect" type="file" name="fileToUpload" accept="image/jpeg">`. Since this is client side filtering, we can use burpsuite to circumvent if necessary
-3. Now that we know that the client side filter only accepts jpg, we can try to pass it by removing the restriction with burpsuite. Follow the same procedure as when we used burpsuite to bypass client side filtering
+3. Now that we know that the client side filter only accepts jpg, we can try to pass it by removing the restriction with burpsuite. Follow the same procedure as when we used burpsuite to bypass client side filtering. Note: Make sure that you use this when you're going to the page for the first time. If you already loaded the page, it's going to be stored in your cache and you won't be able to edit the code. If you aren't able to edit it, clear the cache and try again. Note: Make sure to use `http://jewel.uploadvulns.thm/`, without the last / the request goes to google, and the requested page is encrypted for some reason
+4. After the html has load in burpsuite, remove the `accept="image/jpeg"` from the input tag
+5. Now if we try to prepare and uplaod out php reverse shell, we're still greeted with the "Invalid file format" message. This means that on top of the client side filter, there's also a server side filter that checks for the file format
