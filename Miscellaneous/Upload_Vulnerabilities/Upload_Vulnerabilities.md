@@ -294,7 +294,8 @@
 
 
 ## Challenge
-1. Use gobuster to enumerate: `gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://jewel.uploadvulns.thm/`. We find that the only ones we can access are /admin, /Admin, and /ADMIN. All three lead to the same directory, and we see that the admin page states, "As a reminder: use this form to activate modules from the /modules directory." We can assume that files we upload will go to the /modules directory, and after we upload the reverse shell we can activate it from this page. There seems to be a 25 character limit to the input in the admin page `<input type=text name=cmd placeholder="Enter file to execute" maxlength=25>`, so make sure to keep the names+extensions of files below 25
+https://blog.cyberethical.me/thm-uploadvulns#fuzzing
+1. Use gobuster to enumerate: `gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://jewel.uploadvulns.thm/`. We find that the only ones we can access are /admin, /Admin, and /ADMIN. All three lead to the same directory, and we see that the admin page states, "As a reminder: use this form to activate modules from the /modules directory." We can assume that files we upload will go to the /modules directory, and after we upload the reverse shell we can activate it from this page. There seems to be a 25 character limit to the input in the admin page `<input type=text name=cmd placeholder="Enter file to execute" maxlength=25>`, so make sure to keep the names+extensions of files below 25. The landing page
 >root@ip-10-10-94-8:~# gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://jewel.uploadvulns.thm/
 >===============================================================
 >Gobuster v3.0.1
@@ -319,7 +320,45 @@
 >===============================================================
 >2021/11/30 06:23:22 Finished
 >===============================================================
-2. Look at the page source for the landing page and we see that the input accepts files with MIME type of "image/jpeg" `<input id="fileSelect" type="file" name="fileToUpload" accept="image/jpeg">`. Since this is client side filtering, we can use burpsuite to circumvent if necessary
-3. Now that we know that the client side filter only accepts jpg, we can try to pass it by removing the restriction with burpsuite. Follow the same procedure as when we used burpsuite to bypass client side filtering. Note: Make sure that you use this when you're going to the page for the first time. If you already loaded the page, it's going to be stored in your cache and you won't be able to edit the code. If you aren't able to edit it, clear the cache and try again. Note: Make sure to use `http://jewel.uploadvulns.thm/`, without the last / the request goes to google, and the requested page is encrypted for some reason
-4. After the html has load in burpsuite, remove the `accept="image/jpeg"` from the input tag
-5. Now if we try to prepare and uplaod out php reverse shell, we're still greeted with the "Invalid file format" message. This means that on top of the client side filter, there's also a server side filter that checks for the file format
+2. Look at the page source for the landing page and we see that the input accepts files of type "image/jpeg" (this is not a filter) `<input id="fileSelect" type="file" name="fileToUpload" accept="image/jpeg">`. We also see that there's script being used called 'upload.js'. When we look at it, we see that there's three types of client side filtering being used: file length, magic number, and extension validation
+>//Check File Size
+>if (event.target.result.length > 50 * 8 * 1024){
+>	setResponseMsg("File too big", "red");			
+>	return;
+>}
+>//Check Magic Number
+>if (atob(event.target.result.split(",")[1]).slice(0,3) != "ÿØÿ"){
+>	setResponseMsg("Invalid file format", "red");
+>	return;	
+>}
+>//Check File Extension
+>const extension = fileBox.name.split(".")[1].toLowerCase();
+>if (extension != "jpg" && extension != "jpeg"){
+>	setResponseMsg("Invalid file format", "red");
+>	return;
+>}
+3. Now that we know the types of filtering on the client side, we can try to pass them by removing the restrictions with burpsuite. Set up burpsuite by following the same procedure as when we used burpsuite to bypass client side filtering.
+- Note: Make sure that you use this when you're going to the page for the first time. If you already loaded the page, it's going to be stored in your cache and you won't be able to edit the code. If you aren't able to edit it, clear the cache and try again.
+- Note: Make sure to use `http://jewel.uploadvulns.thm/`, without the last / the request goes to google, and the requested page is encrypted for some reason
+- Note: Burpsuite doesn't intercept .js files by default, so to edit js that's not inline, go to Proxy > Options > Intercept Client Requests and edit the File Extension filter to remove `$|^js`
+4. After setting up burpsuite and navigating to the website, burpsuite will GET the html code for the website. To view the response, right click > Do Intercept > Response to this request. Then click Forward to see the html code. In the input tag, remove the `accept="image/jpeg" attribute`. This isn't necessary, but it'll make things easier when uploading the file later. Click Forward until the GET request for upload.js appears, then right click and select Do Intercept > Response to this request, and now when you click Forward the script will appear
+5. Remove the filtering checks from the js file and then click Forward until the page is finished loading:
+>//Check File Size
+>if (event.target.result.length > 50 * 8 * 1024){
+>	setResponseMsg("File too big", "red");			
+>	return;
+>}
+>//Check Magic Number
+>if (atob(event.target.result.split(",")[1]).slice(0,3) != "ÿØÿ"){
+>	setResponseMsg("Invalid file format", "red");
+>	return;	
+>}
+>//Check File Extension
+>const extension = fileBox.name.split(".")[1].toLowerCase();
+>if (extension != "jpg" && extension != "jpeg"){
+>	setResponseMsg("Invalid file format", "red");
+>	return;
+>}
+5. Now we want to know which payload we should prepare. By using whatweb `whatweb jewel.uploadvulns.thm` we find that the backend is using express, which is a js framwork. Now we know that we need to use a js payload, which we can find on metasploit
+>$ whatweb jewel.uploadvulns.thm                                                                      
+>http://jewel.uploadvulns.thm [200 OK] Country[RESERVED][ZZ], HTML5, HTTPServer[Ubuntu Linux][nginx/1.14.0 (Ubuntu)], IP[10.10.150.149], JQuery[3.5.1], Object[image/svg+xml], Script, Title[Jewel], UncommonHeaders[access-control-allow-origin,front-end-https], X-Powered-By[Express], nginx[1.14.0]
