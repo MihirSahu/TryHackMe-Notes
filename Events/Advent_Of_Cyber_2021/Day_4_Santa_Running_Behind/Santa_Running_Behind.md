@@ -33,5 +33,5 @@
 4. Now Right click and Send to Intruder. Then go to Intruder > Positions and select "Clear §". Since we already know what the username is, we only need to fuzz the password, so highlight the value of the password and click "Add §"
 5. Go to the Payloads tab and add the payload in the Payload Options section. Then click Start Attack
 6. A new window will pop up that displays the word from the wordlist, the response, and the response size. The responses of the wrong words will have the same sizes, while the correct word will have a different size from the rest
-## Exersize
+## Exercize
 - Do exactly what we did in the example and we find that the password is "cookie" and the flag is "THM{SANTA_DELIVERS}"
