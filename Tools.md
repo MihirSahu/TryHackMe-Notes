@@ -14,6 +14,12 @@ This is a list of useful tools that I can reference later.
 - Dirb
 - Curl
 
+## Networking
+- Ping
+- Traceroute
+- Whois
+- Dig
+
 ## Hashing
 - Hashcat
 - John the ripper
