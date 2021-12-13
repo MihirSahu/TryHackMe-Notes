@@ -1,7 +1,7 @@
 # Sharing Without Caring
 
 1. Use nmap to enumerate
-`
+```
 $ sudo nmap --script=vuln -sS -A 10.10.119.239                                                                                                                                                           1 ⨯
 [sudo] password for kali: 
 Starting Nmap 7.92 ( https://nmap.org ) at 2021-12-13 16:51 EST
@@ -63,4 +63,4 @@ HOP RTT       ADDRESS
 
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 274.60 seconds
-`
+```
