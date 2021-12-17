@@ -64,3 +64,27 @@ HOP RTT       ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 274.60 seconds
 ```
+2. 7
+- Network File System (NFS) is a protocol that allows the ability to transfer files between different computers and is available on many systems, including MS Windows and Linux
+- Depending on whether we used -sV or -A on nmap, we can see any nfs services
+3. 2049
+- Once we know that NFS is running we can use the `showmount` tool to check which files are being shared
+4. Use `showmount -e <ip>` to display shares
+```
+$ showmount -e 10.10.71.38                  
+Export list for 10.10.71.38:
+/share        (everyone)
+/admin-files  (everyone)
+/my-notes     (noone)
+/confidential (everyone)
+```
+5. 4
+6. 3
+- Create a new folder and mount the /share share to the folder: `$ sudo mount 10.10.71.38:/share temp`
+7. Open up 2680.txt and we see that it's a book titled Meditations
+8. Use `umount temp` to unmount that /share share. Then try mounting the other shares and checking their contents. When we try the admin-files share we get `mount.nfs: access denied by server while mounting 10.10.71.38:/admin-files`. When we try /confidential, we see that there's an ssh folder inside with the private and public keys
+9. Use `md5sum id_rsa`
+```
+$ md5sum id_rsa
+3e2d315a38f377f304f5598dc2f044de  id_rsa
+```
