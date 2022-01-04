@@ -24,4 +24,22 @@
 - [SPF Record check](https://dmarcian.com/spf-survey/)
 - [Resource 1](https://dmarcian.com/spf-syntax-table/), [Resource 2](https://dmarcian.com/what-is-the-difference-between-spf-all-and-all/)
 
-## DKIM
+## DKIM (DomainKeys Identified Mail)
+- DKIM (DomainKeys Identified Mail) authenticates an email that's being sent
+- DKIM records exist in DNS, but is more complicated that SPF and can survive forwarding, which makes it superior to SPF
+- Ex. `v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxTQIC7vZAHHZ7WVv/5x/qH1RAgMQI+y6Xtsn73rWOgeBQjHKbmIEIlgrebyWWFCXjmzIP0NYJrGehenmPWK5bF/TRDstbM8uVQCUWpoRAHzuhIxPSYW6k/w2+HdCECF2gnGmmw1cT6nHjfCyKGsM0On0HDvxP8I5YQIIlzNigP32n1hVnQP+UuInj0wLIdOBIWkHdnFewzGK2+qjF2wmEjx+vqHDnxdUTay5DfTGaqgA9AKjgXNjLEbKlEWvy0tj7UzQRHd24a5+2x/R4Pc7PF/y6OxAwYBZnEPO0sJwio4uqL9CYZcvaHGCLOIMwQmNTPMKGC9nt3PSjujfHUBX3wIDAQAB`
+    - v=DKIM1-> This is the version of the DKIM record. This is optional. 
+    - k=rsa -> This is the key type. The default value is RSA. RSA is an encryption algorithm (cryptosystem).
+    - p= -> This is the public key that will be matched to the private key, which was created during the DKIM setup process. 
+- [Resource 1](https://dmarcian.com/dkim-selectors/), [Resource 2](https://help.returnpath.com/hc/en-us/articles/222481088-DKIM-DNS-record-overview)
+- The `Authentication-Results` header shows whether DKIM passed or failed
+
+## DMARC (Domain-based Message Authentication Reporting and Conformance)
+- Ties the result of SPF and DKIM together to the content of an email
+- Ex. `v=DMARC1; p=quarantine; rua=mailto:postmaster@website.com`
+    - v=DMARC1 -> Must be in all caps, and it's not optional
+    - p=quarantine -> If a check fails, then an email will be sent to the spam folder (DMARC Policy)
+    - rua=mailto:postmaster@website.com -> Aggregate reports will be sent to this email address
+- [Resource](https://dmarcian.com/dmarc-record/)
+- [Resource](https://dmarc.org/overview/)
+- [Resource](https://dmarcian.com/alignment/)
