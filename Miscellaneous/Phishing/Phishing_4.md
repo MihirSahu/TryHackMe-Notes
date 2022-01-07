@@ -43,3 +43,23 @@
 - [Resource](https://dmarcian.com/dmarc-record/)
 - [Resource](https://dmarc.org/overview/)
 - [Resource](https://dmarcian.com/alignment/)
+
+## S/MIME (Secure/Multipurpose Internet Mail Extensions)
+- 2 main parts of S/MIME are
+    1. Digital signatures
+    2. Encryption
+- Process
+    - If Bob wishes to use S/MIME, then he'll need a digital certificate. This digital certificate will contain his public key. 
+    - With this digital certificate, Bob can "sign" the email message with his private key. 
+    - Mary can then decrypt Bob's message with Bob's public key. 
+    - Mary will do the same (send her certificate to Bob) when she replies to his email, and Bob complete the same process on his end.
+    - Both will now have each other's certificates for future correspondence. 
+- [Resource](https://docs.microsoft.com/en-us/exchange/security-and-compliance/smime-exo/smime-exo)
+- Nonrepudiation - The uniqueness of a signature prevents the owner of the signature from disowning the signature
+
+## SMPT Status Codes
+- [Resource](https://www.wireshark.org/docs/dfref/s/smtp.html)
+- [Resource](https://www.mailersend.com/blog/smtp-codes)
+- Use `smtp.response.code` to filter using status codes
+- Use filter `smtp.response.code == 220` and find status code `<domain> Service ready`
+- Use `smtp.response.code` and search for an email blocked by smaphaus.org, the answer is `156,553`. Error is `mailbox name not allowed`
