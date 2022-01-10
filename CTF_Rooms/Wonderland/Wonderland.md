@@ -95,4 +95,18 @@ Alice felt that this could not be denied, so she tried another question. "What s
 "In that direction,"" the Cat said, waving its right paw round, "lives a Hatter: and in that direction," waving the other paw, "lives a March Hare. Visit either you like: they're both mad."
 ```
 
-5. 
+5. Once we land in alice's home directory we find a `root.txt` and `walrus_and_the_carpenter.py`. Because we finally have access to the machine, we should be able to find user.txt, however we don't see it anywhere here. The hint says `Everything is upside down here.`. Maybe the contents of user.txt are in root.txt? Try it and we find that we don't have permissions to read root.txt. Maybe the user.txt is in the `/root` directory? If we try to print out the contents of `/root`, we get a permission denied error, but if we try to print user.txt - assuming it's in the `/root` directory - `cat /root/user.txt` we get `thm{"Curiouser and curiouser!"}`
+
+6. Now we want to escalate privileges. We see that there's 4 folders in the `/home` directory: alice, hatter, rabbit, and tryhackme, but we can't access any other than alice. Let's use `sudo -l` with alice's password to see if alice has any special permissions. We find that alice can run this exact command `/usr/bin/python3.6 /home/alice/walrus_and_the_carpenter.py` as rabbit. Looking at the contents of `walrus_and_carpenter.py`, we see that it prints out random lines from a poem. The most important part of the program is the `import random`. What if we make the program import a file of our choosing instead of the module? Create a new file inside the same directory named `random.py` and insert `import pty; pty.spawn("/bin/bash")` into it, which will create a new shell for us as rabbit if it's run with rabbit's permissions. Since we can run the `/usr/bin/python3.6 /home/alice/walrus_and_the_carpenter.py` command as rabbit, let's do so with `sudo -u rabbit /usr/bin/python3.6 /home/alice/walrus_and_the_carpenter.py`, and we should now be logged in as rabbit
+```
+User alice may run the following commands on wonderland:
+    (rabbit) /usr/bin/python3.6 /home/alice/walrus_and_the_carpenter.py
+```
+
+7. Now we have access to rabbit's home directory, and we see that it has one file called `teaParty`. We can try using `sudo -l`, but we don't have rabbit's password so we can't view any special permissions. Run `file teaParty` and we find that it's an executable file, so run it and we get some output. If we print out the contents with `cat teaParty` we see that the date is being printed out dynamically using the date program `The Mad Hatter will be here soon./bin/echo -n 'Probably by ' && date --date='next hour' -RAsk very nicely, and I will give you some tea while you wait for himSegmentation fault (core dumped)`. Since the absolute path of the date command isn't being used to reference the program (unlike echo, which is being called with `/bin/echo`), we can change the PATH variable and write our own program called date, which will then execute code of our choosing. So let's append our current directory to the PATH with `export PATH=/home/rabbit:$PATH`. This appends our directory to the beginning of the PATH variable, so the first place bash will check for the date program is our directory. Now let's create a file named `date`, enter a shebang `#!/bin/bash` and use the same python code we used last time `python3 -c 'import pty; pty.spawn("/bin/bash")'`. Finally, make the date file executable with `chmod +x date`. You can now check if your date is detected in the PATH with `which date`. If this returns `/home/rabbit/date`, you've successfully changed the path. Now if we run `teaParty`, our date file will be run and it will create a new shell as the hatter
+```
+Welcome to the tea party!
+The Mad Hatter will be here soon.
+Probably by Sat, 08 Jan 2022 21:46:21 +0000
+Ask very nicely, and I will give you some tea while you wait for him
+```
