@@ -37,6 +37,36 @@
     2. `~/.bash_history`
     3. `thm{clear_the_history}`
 
+## /etc
+- `/etc` folder contains unspecified items
+- Central location for all your configuration files
+- Important files
+    - `/etc/passwd`
+        - Stores most essential information needed during user login
+        - Contains list of system accounts and configuration for each account
+        - If you have write access you can easily create a [custom user with root privileges](http://www.hackingarticles.in/editing-etc-passwd-file-for-privilege-escalation)
+    - `/etc/shadow`
+        - Contains actual passwords in an encrypted format
+        - Ex. `goldfish:$6$1FiLdnFwTwNWAqYN$WAdBGfhpwSA4y5CHGO0F2eeJpfMJAMWf6MHg7pHGaHKmrkeYdVN7fD.AQ9nptLkN7JYvJyQrfMcfmCHK34S.a/:18483:0:99999:7:::`
+```
+1. (goldfish) - Username
+2. ($6$1FiLdnFwT...) - Password : Encrypted password.
+Basic structure: **$id$salt$hashed**, The $id is the algorithm used On GNU/Linux as follows:
+- $1$ is MD5
+- $2a$ is Blowfish
+- $2y$ is Blowfish
+- $5$ is SHA-256
+- $6$ is SHA-512
+3. (18483) - Last password change: Days since Jan 1, 1970 that password was last changed.
+4. (0) - Minimum: The minimum number of days required between password changes (Zero means that the password can be changed immidiately).
+5. (99999) - Maximum: The maximum number of days the password is valid.
+6. (7) - Warn: The number of days before the user will be warned about changing their password.
+```
+        - Having reading access to this file allows you to crack the password using hashcat or john the ripper
+        - Having writing access allows us to add a new root user
+    - `/etc/hosts`
+        - Assigns a hostname to a specific IP address
+
 ## Find Command and Interesting Files
 - Most important options for find in enumeration are `-type` and `-name`
 - Look out for interesting log and configuration files, as well as any backups that the system owner might be keeping
@@ -103,3 +133,16 @@
 - Exercise
     1. Use `find / -perm -u=s -type f 2>/dev/null` to find `/bin/grep`
     2. Use GTFOBins to find that we can abuse grep with `grep '' <file>`
+
+## Port Forwarding
+- Application of NAT that redirects a communication request from one address and port number to another while packets are traversing a network gateway
+- Port forwarding lets you bypass firewalls and enumerate local services and processes running on the target machine
+- `netstat -at | less` to see all TCP connections and processes running on them
+- `netstat -tulpn` for nicer output
+- [Resource](https://fumenoid.github.io/posts/port-forwarding)
+    - Bind address - defines the network in which a service is accessible
+        - If we have public ip `57.234.890.210`, internal network ip `10.10.10.120`, and local address `127.0.0.1`, then binding a service to each of these addresses will allow different people to access it
+
+## Automating Scripts
+- Linpeas
+- LinEnum
