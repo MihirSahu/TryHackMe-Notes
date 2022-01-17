@@ -1,0 +1,14 @@
+aaa
+afl
+pdf @main
+db 0x55701cc35612
+db 0x55701cc35618
+dc
+dr
+ls
+dr
+pdf @main
+ds
+pdf @main
+ds
+px @rbp-0x8
