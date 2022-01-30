@@ -23,6 +23,7 @@ Port scanning - learn "landscape" of IP address and see which services are runni
 			TCP Xmas scans (-sX)
 
 		Use -p to specify port(s)
+		By default nmap only scans the top 1000 ports, to scan all ports use -p-
 		*Always use -vv to increase verbosity
 
 	TCP Connect Scans

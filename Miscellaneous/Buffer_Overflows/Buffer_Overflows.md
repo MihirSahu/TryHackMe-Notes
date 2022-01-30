@@ -22,6 +22,7 @@
 
 ## Must Watch
 - [Great must watch resource about stacks and heaps](https://www.youtube.com/watch?v=_8-ht2AKyH4)
+- [Great resource about general assembly](https://www.youtube.com/watch?v=6jSKldt7Eqs)
 
 ## x86-64 Procedures
 - ![Diagram](Images/procedures_1.png)

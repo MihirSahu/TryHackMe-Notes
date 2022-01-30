@@ -63,3 +63,13 @@
 - Use `smtp.response.code` to filter using status codes
 - Use filter `smtp.response.code == 220` and find status code `<domain> Service ready`
 - Use `smtp.response.code` and search for an email blocked by smaphaus.org, the answer is `156,553`. Error is `mailbox name not allowed`
+
+## SMPT Traffic Analysis
+- [Resource](https://www.wireshark.org/docs/dfref/i/imf.html)
+
+## SMPT and C&C Communication
+- C&C (Command and Control)
+- [Resource](https://attack.mitre.org/techniques/T1071/003/)
+
+## Conclusion
+- [Resource](https://www.incidentresponse.com/playbooks/phishing)

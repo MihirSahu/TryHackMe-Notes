@@ -79,3 +79,5 @@ exit
 
 ## Cron Jobs - PATH Environment Variable
 - If the absolute path of the program that is scheduled to run isn't used, then you can easily create a program of the same name, edit the PATH variable to include the file you created, and wait for the cron job to run your script
+
+## Cron Jobs - Wildcards
