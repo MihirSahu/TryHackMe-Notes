@@ -1,0 +1,3 @@
+- The passwords are literally on this github repo, which can be found through OSINT
+- python3 has the SUID bit set
+- Polkit is vulnerable to the pwnkit exploit
