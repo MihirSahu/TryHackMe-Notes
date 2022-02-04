@@ -1,3 +1,5 @@
 - The passwords are literally on this github repo, which can be found through OSINT
 - python3 has the SUID bit set
 - Polkit is vulnerable to the pwnkit exploit
+- `/etc/shadow` file is readable and writable by anyone
+- ftp server has anonymous login enabled (Note: The ftp server (vsftpd) config file was configured with [this resource](https://web.mit.edu/rhel-doc/5/RHEL-5-manual/Deployment_Guide-en-US/s1-ftp-vsftpd-conf.html), and the config file in included in this directory)
