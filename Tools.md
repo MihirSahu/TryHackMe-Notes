@@ -24,6 +24,7 @@ This is a list of useful tools that I can reference later.
 - Hashcat
 - John the ripper
 - [Crackstation](https://crackstation.net/)
+- [Houndsniff](https://github.com/MichaelDim02/houndsniff)
 
 ## Encoding
 - Cyberchef
@@ -33,3 +34,8 @@ This is a list of useful tools that I can reference later.
 - Ghidra
 - Radare2
 - IDA Pro
+- pwndbg
+- peda
+- gdbinit
+- pwntools
+- checksec.sh
