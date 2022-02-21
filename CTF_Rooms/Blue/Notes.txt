@@ -29,3 +29,7 @@ Cracking
 Find Flags!
 21. search -f flag*
 22. Print out contents of flags
+
+flag 1: flag{access_the_machine}, located at C:
+flag 2: flag{sam_database_elevated_access}, located at C:\Windows\System32\config
+flag 3: flag{admin_documents_can_be_valuable}, located at C:\Users\Jon\Documents
