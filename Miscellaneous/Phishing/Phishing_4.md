@@ -19,7 +19,7 @@
 - Ex. `v=spf1 ip4:127.0.0.1 include:_spf.google.com -all`
     - v=spf1 -> This is the start of the SPF record
     - ip4:127.0.0.1 -> This specifies which IP (in this case version IP4 & not IP6) can send mail
-    - include:_spf.google.com -> This specifies which domain can send mail
+    - `include:_spf.google.com` -> This specifies which domain can send mail
     - -all -> non-authorized emails will be rejected
 - [SPF Record check](https://dmarcian.com/spf-survey/)
 - [Resource 1](https://dmarcian.com/spf-syntax-table/), [Resource 2](https://dmarcian.com/what-is-the-difference-between-spf-all-and-all/)
