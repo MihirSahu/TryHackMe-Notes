@@ -16,11 +16,16 @@ This is a list of useful tools that I can reference later.
 - Dirb
 - Curl
 
-## Networking
+## OSINT
 - Ping
 - Traceroute
 - Whois
 - Dig
+- Nslookup
+- The Harvester
+- Shodan
+- Recon-ng
+- Maltego
 
 ## Hashing
 - Hashcat
