@@ -2,7 +2,8 @@
 
 This is a list of useful tools that I can reference later.
 
-### [Payloads All The Things](https://github.com/swisskyrepo/PayloadsAllTheThings)
+## [Payloads All The Things](https://github.com/swisskyrepo/PayloadsAllTheThings)
+## [CTF Checklist](https://fareedfauzi.gitbook.io/ctf-checklist-for-beginner/)
 
 ## General
 - Metasploit
@@ -46,3 +47,9 @@ This is a list of useful tools that I can reference later.
 - gdbinit
 - pwntools
 - checksec.sh
+
+## Steganography
+- Steghide
+- Binwalk
+- Stegsolve
+- Zsteg
