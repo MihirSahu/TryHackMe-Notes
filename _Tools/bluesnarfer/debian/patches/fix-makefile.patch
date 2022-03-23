@@ -1,0 +1,23 @@
+From: Sophie Brun <sophie@offensive-security.com>
+Date: Tue, 15 Jun 2021 11:05:01 +0200
+Subject: Fix Makefile
+
+
+Origin:  https://github.com/kimbo/bluesnarfer/commit/f6224381c4e743ca3b90f8fb2d9641e508ce1cdb
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 891a0dc..34cb25c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,6 +7,6 @@ INC = -Iinclude
+ 
+ all: bluesnarfer
+ 
+-bluesnarfer:
+-	$(CC) $(INC) $(CFLAGS) $(LDFLAGS) $(SRC)/bluesnarfer.c -o bluesnarfer
++bluesnarfer: src/bluesnarfer.c
++	$(CC) $(INC) $(CFLAGS) $(SRC)/bluesnarfer.c $(LDFLAGS) -o bluesnarfer
+ 

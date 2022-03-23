@@ -1,0 +1,21 @@
+bluesnarfer (0.1-1kali1) kali-dev; urgency=medium
+
+  [ Raphaël Hertzog ]
+  * Update Maintainer field
+  * Update Vcs-* fields for the move to gitlab.com
+  * Add GitLab's CI configuration file
+  * Configure git-buildpackage for Kali
+  * Update URL in GitLab's CI configuration file
+
+  [ Sophie Brun ]
+  * Add a patch to fix the build
+  * Use debhelper-compat 13
+  * Bump Standards-Version to 4.5.1
+
+ -- Sophie Brun <sophie@offensive-security.com>  Tue, 15 Jun 2021 11:16:11 +0200
+
+bluesnarfer (0.1-1kali0) kali; urgency=low
+
+  * Initial release
+
+ -- Mati Aharoni <muts@kali.org>  Sat, 17 Aug 2013 13:29:35 -0400

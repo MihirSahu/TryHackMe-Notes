@@ -1,0 +1,17 @@
+Source: bluesnarfer
+Section: misc
+Priority: optional
+Maintainer: Kali Developers <devel@kali.org>
+Uploaders: Mati Aharoni <muts@kali.org>,
+           Sophie Brun <sophie@offensive-security.com>,
+Build-Depends: debhelper-compat (= 13),libbluetooth-dev
+Standards-Version: 4.5.1
+Homepage: http://www.alighieri.org/
+Vcs-Git: https://gitlab.com/kalilinux/packages/bluesnarfer.git
+Vcs-Browser: https://gitlab.com/kalilinux/packages/bluesnarfer
+
+Package: bluesnarfer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, bluez
+Description: A Bluesnarfing Utility
+ A bluetooth bluesnarfing Utility
