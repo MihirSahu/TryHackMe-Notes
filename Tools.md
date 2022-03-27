@@ -61,3 +61,7 @@ This is a list of useful tools that I can reference later.
 - Reaver
 - Wifite
 - Bluesnarfer
+
+## Privilege Escalation
+- LinEnum
+- Pspy
