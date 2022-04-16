@@ -3,6 +3,7 @@
 This is a list of useful tools that I can reference later.
 
 ## [Payloads All The Things](https://github.com/swisskyrepo/PayloadsAllTheThings)
+## [HackTricks](https://book.hacktricks.xyz/)
 ## [CTF Checklist](https://fareedfauzi.gitbook.io/ctf-checklist-for-beginner/)
 
 ## General
@@ -65,3 +66,5 @@ This is a list of useful tools that I can reference later.
 ## Privilege Escalation
 - LinEnum
 - Pspy
+- LinPeas
+- [Upgrade simple shells to fully interactive tty](https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/)

