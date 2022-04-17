@@ -17,6 +17,7 @@ This is a list of useful tools that I can reference later.
 - Gobuster
 - Dirb
 - Curl
+- [WPScan](https://github.com/wpscanteam/wpscan)
 
 ## OSINT
 - Ping
