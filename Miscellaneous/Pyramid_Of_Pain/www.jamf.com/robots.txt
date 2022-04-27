@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /footer/
+
+Sitemap: https://www.jamf.com/sitemap/
+
+User-agent: AhrefsBot
+Crawl-Delay: 180
+
+User-agent: rogerbot
+Disallow: /jamf-nation/
