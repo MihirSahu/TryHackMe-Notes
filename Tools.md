@@ -44,11 +44,11 @@ This is a list of useful tools that I can reference later.
 - Ghidra
 - Radare2
 - IDA Pro
-- pwndbg
+- [pwndbg](https://github.com/pwndbg/pwndbg)
 - peda
 - gdbinit
-- pwntools
-- checksec.sh
+- [pwntools](https://github.com/Gallopsled/pwntools)
+- [checksec.sh](https://github.com/slimm609/checksec.sh)
 
 ## Steganography
 - Steghide

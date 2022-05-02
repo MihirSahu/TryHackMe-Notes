@@ -40,3 +40,30 @@
 ```
 
 ## SMTP
+- SMTP - Simple mail transfer protocol
+	- Handles the sending of emails
+	- Functions
+		- Verifies who is sending emails through SMTP server
+		- Sends the outgoing mail
+		- If the outgoing mail can't be delivered it sends the message back to the sender
+- POP/IMAP handle the retrieving of emails
+	- POP - Post office protocol
+		- Downloads the inbox from the mail server to the client
+	- IMAP - Internet message access protocol
+		- Synchronizes the current inbox and downloads anything new
+- Steps
+```
+1. The mail user agent, which is either your email client or an external program. connects to the SMTP server of your domain, e.g. smtp.google.com. This initiates the SMTP handshake. This connection works over the SMTP port- which is usually 25. Once these connections have been made and validated, the SMTP session starts.
+
+2. The process of sending mail can now begin. The client first submits the sender, and recipient's email address- the body of the email and any attachments, to the server.
+
+3. The SMTP server then checks whether the domain name of the recipient and the sender is the same.
+
+4. The SMTP server of the sender will make a connection to the recipient's SMTP server before relaying the email. If the recipient's server can't be accessed, or is not available- the Email gets put into an SMTP queue.
+
+5. Then, the recipient's SMTP server will verify the incoming email. It does this by checking if the domain and user name have been recognised. The server will then forward the email to the POP or IMAP server, as shown in the diagram above.
+
+6. The E-Mail will then show up in the recipient's inbox.
+```
+
+## Enumerating SMTP
