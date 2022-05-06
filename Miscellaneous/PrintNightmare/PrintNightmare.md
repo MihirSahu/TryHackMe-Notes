@@ -91,3 +91,13 @@ DCE/RPC stands for Distributed Computing Environment/Remote Procedure Calls and 
 
 Corelight also released a Zeek package that detects the printer driver additions over DCE/RPC commands that are not encrypted.
 ```
+
+## Mitigation: Disable Print Spooler
+- Disable print spooler on all domain controllers and modify the registry settings
+- [Microsoft guide](https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527)
+- Determine if Print Spooler is running with `Get-Service -Name Spooler`
+- Disable Print Spooler service
+	- `Stop-Service -Name Spooler -Force`
+	- `Set-Service -Name Spooler -StartupType Disabled`
+	- This removes the ability to print locally and remotely
+- Disable inbound remote printing through Group Policy

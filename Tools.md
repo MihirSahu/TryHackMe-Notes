@@ -69,3 +69,7 @@ This is a list of useful tools that I can reference later.
 - Pspy
 - LinPeas
 - [Upgrade simple shells to fully interactive tty](https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/)
+
+## Printer Hacking
+- [Hacking Printers](http://hacking-printers.net/)
+- [PRET](https://github.com/RUB-NDS/PRET)
