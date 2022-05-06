@@ -170,3 +170,38 @@ Input the attack file into the intro2pwn3 binary in the command line (because gd
 
 ./intro2pwn3 < attack
 ```
+
+## Networking
+```
+We will need to write a script to connect to the port, receive the data, and send our payload. To connect to a port in Pwntools, use the remote() function in the format of: remote(IP, port). 
+
+from pwn import *
+
+connect = remote('127.0.0.1', 1336)
+
+We can receive data with either the recvn(bytes) or recvline() functions. The recvn() receives as many bytes as specified, while the recvline() will receive data until there is a newline. Our code does not send a newline, so we will have to use recvn(). In our test_networking.c code, the "Give me deadbeef: " is 18 bytes, so we will receive 18 bytes.
+
+print(connect.recvn(18))
+
+We have to send enough data to overflow the buff variable, and write to the printflag. the buff is a 32 byte array, so we can write some character 32 times to overflow buff, and then write our 0xdeadbeef to printflag.
+
+payload = "A"*32
+
+payload += p32(0xdeadbeef)
+
+We can send the payload with the send() function.
+
+connect.send(payload)
+
+To receive our flag, We can just use connect.recvn() again. According to the c code, the flag will be 34 bytes long.
+
+print(connect.recvn(34))
+
+Run this against your server at 1336 and make sure it works. Once you have, change the port to the answer to question 1 to receive the flag!
+```
+
+## Shellcraft
+- ASLR - Address space layout randomization
+	- Randomizes where in memory the executable is loaded each time it is run
+	- Like PIE, makes attacks that rely on memory layout more difficult
+- 
