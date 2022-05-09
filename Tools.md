@@ -70,6 +70,9 @@ This is a list of useful tools that I can reference later.
 - LinPeas
 - [Upgrade simple shells to fully interactive tty](https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/)
 
+## SMTP
+- [smtp-user-enum](https://pentestmonkey.net/tools/user-enumeration/smtp-user-enum)
+
 ## Printer Hacking
 - [Hacking Printers](http://hacking-printers.net/)
 - [PRET](https://github.com/RUB-NDS/PRET)

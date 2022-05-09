@@ -67,3 +67,38 @@
 ```
 
 ## Enumerating SMTP
+- Enumerating server details
+	- Poorly configured mail servers can provide an initial foothold into a network
+	- First, fingerprint the server to make targeting as precise as possible
+		- Use metasploit's `smtp_version` module
+- Enumerating users from smtp
+	- SMTP service has two internal commands that allow enumeration of users
+		- VRFY - confirms names of valid users
+		- EXPN - reveals actual addresses of user aliases and lists of email
+	- We can use metasploit's `smtp_enum` module for this
+	- Can also use [smtp-user-enum](https://pentestmonkey.net/tools/user-enumeration/smtp-user-enum)
+- We should look for a user account name and the type of SMTP server and OS running
+
+## MySQL
+- MySQL isa a RDBMS based on SQL
+- Uses the client server model, communicate with MySQL protocol
+- Server handles creating, editing, and accessing data
+- Stages
+	1. MySQL creates a database for storing and manipulating data, defining the relationship of each table
+	2. Clients make requests by making specific statements in SQL
+	3. The server will respond to the client with whatever information has been requests
+
+## Enumerating MySQL
+- MySQL is likely not going to be the first point of call when getting initial information about the server
+- Typically, you will have gained some initial credentials from enumerating other services that you can then use to enumerate and exploit the MySQL service
+- You will need to have MySQL installed on your system
+- Metasploit's built in module `mysql_sql` or nmap scripts like `mysql-enum` can be used
+- Connect to mysql server with `mysql -h <ip address> -u <username> -p`
+
+## Exploiting MySQL
+- `mysql_schemadump` module dumps databases
+- `mysql_hashdump` module dumps password hashes
+
+## Further Learning
+- [Resource 1](https://web.mit.edu/rhel-doc/4/RH-DOCS/rhel-sg-en-4/ch-exploits.html)
+- [Resource 2](https://www.nextgov.com/cybersecurity/2019/10/nsa-warns-vulnerabilities-multiple-vpn-services/160456/)
