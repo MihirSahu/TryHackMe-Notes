@@ -69,6 +69,8 @@ This is a list of useful tools that I can reference later.
 - Pspy
 - LinPeas
 - [Upgrade simple shells to fully interactive tty](https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/)
+- [Mimikatz](https://github.com/gentilkiwi/mimikatz)
+- [PowerSploit](https://github.com/PowerShellMafia/PowerSploit)
 
 ## SMTP
 - [smtp-user-enum](https://pentestmonkey.net/tools/user-enumeration/smtp-user-enum)
