@@ -9,6 +9,7 @@ This is a list of useful tools that I can reference later.
 ## General
 - Metasploit
 - Netcat
+- Searchsploit
 
 ## Web exploitation
 - Whatweb
