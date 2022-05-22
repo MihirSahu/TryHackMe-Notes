@@ -73,6 +73,9 @@ This is a list of useful tools that I can reference later.
 - [Mimikatz](https://github.com/gentilkiwi/mimikatz)
 - [PowerSploit](https://github.com/PowerShellMafia/PowerSploit)
 
+## Forensics
+- [PDFinfo](https://www.xpdfreader.com/index.html)
+
 ## SMTP
 - [smtp-user-enum](https://pentestmonkey.net/tools/user-enumeration/smtp-user-enum)
 
