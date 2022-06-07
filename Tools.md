@@ -10,6 +10,7 @@ This is a list of useful tools that I can reference later.
 - Metasploit
 - Netcat
 - Searchsploit
+- CyberChef
 
 ## Web exploitation
 - Whatweb
@@ -36,9 +37,11 @@ This is a list of useful tools that I can reference later.
 - John the ripper
 - [Crackstation](https://crackstation.net/)
 - [Houndsniff](https://github.com/MichaelDim02/houndsniff)
+- [hash-identifier](https://gitlab.com/kalilinux/packages/hash-identifier/-/tree/kali/master)
 
-## Encoding
-- Cyberchef
+## Encryption
+- [RsaCtfTool](https://github.com/Ganapati/RsaCtfTool)
+- [RsaTool](https://github.com/ius/rsatool)
 
 ## Reverse Engineering
 - GDB + GEF

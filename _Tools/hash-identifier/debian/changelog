@@ -1,0 +1,37 @@
+hash-identifier (1.2+git20180314-0kali1) kali-dev; urgency=medium
+
+  [ Raphaël Hertzog ]
+  * Update Maintainer field
+  * Update Vcs-* fields for the move to gitlab.com
+  * Add GitLab's CI configuration file
+  * Configure git-buildpackage for Kali
+  * Update URL in GitLab's CI configuration file
+
+  [ Sophie Brun ]
+  * Update upstream git repo
+  * New upstream version 1.2+git20180314
+  * Switch to Python 3
+  * Use debhelper-compat 12
+  * Bump Standards-Version to 4.4.0
+  * Fix typo errors
+  * Update installation for new release
+
+ -- Sophie Brun <sophie@offensive-security.com>  Thu, 26 Sep 2019 14:27:44 +0200
+
+hash-identifier (1.1-1kali2) kali; urgency=low
+
+  * Added watch file (Closes: 0000881)
+
+ -- Devon Kearns <dookie@kali.org>  Thu, 09 Jan 2014 16:42:47 -0700
+
+hash-identifier (1.1-1kali1) kali; urgency=low
+
+  * Removed desktop files
+
+ -- Mati Aharoni <muts@kali.org>  Sat, 15 Dec 2012 15:20:37 -0500
+
+hash-identifier (1.1-1kali0) kali; urgency=low
+
+  * Initial release
+
+ -- Devon Kearns <dookie@kali.org>  Thu, 06 Dec 2012 13:17:02 -0700
