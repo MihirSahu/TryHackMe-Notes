@@ -47,6 +47,32 @@
 - Format specific cracking
 	- `john --format=[format] --wordlist=[path to wordlist] [path to file]`
 - Cracking Windows authentication hashes
+	- NTHash / NTLM
+		- NThash is the hash format that modern Windows Operating System machines will store user and service passwords in. It's also commonly referred to as "NTLM" which references the previous version of Windows format for hashing passwords known as "LM", thus "NT/LM".
+		- A little bit of history, the NT designation for Windows products originally meant "New Technology", and was used- starting with Windows NT, to denote products that were not built up from the MS-DOS Operating System. Eventually, the "NT" line became the standard Operating System type to be released by Microsoft and the name was dropped, but it still lives on in the names of some Microsoft technologies.
+		- You can acquire NTHash/NTLM hashes by dumping the SAM database on a Windows machine, by using a tool like Mimikatz or from the Active Directory database: NTDS.dit. You may not have to crack the hash to continue privilege escalation- as you can often conduct a "pass the hash" attack instead, but sometimes hash cracking is a viable option if there is a weak password policy.
+- Cracking Hashes from `/etc/shadow`
+	- The /etc/shadow file is the file on Linux machines where password hashes are stored. It also stores other information, such as the date of last password change and password expiration information. It contains one entry per line for each user or user account of the system. This file is usually only accessible by the root user- so in order to get your hands on the hashes you must have sufficient privileges, but if you do- there is a chance that you will be able to crack some of the hashes.
+	- John can be very particular about the formats it needs data in to be able to work with it, for this reason- in order to crack /etc/shadow passwords, you must combine it with the /etc/passwd file in order for John to understand the data it's being given. To do this, we use a tool built into the John suite of tools called unshadow. The basic syntax of unshadow is as follows:
+		- `unshadow [path to passwrd] [path to shadow]`
+	- Then the hash can be cracked manually
+		- `john --wordlist=/usr/share/wordlists/rockyou.txt --format=sha512crypt unshadowed.txt`
+- Single Crack Mode
+	- A mode in which john uses only the information provided in the username, to try and work out possible passwords heuristically, by slightly changing the letters and numbers contained within the username
+	- Word mangling
+		```
+		If we take the username: Markus
+		Some possible passwords could be:
+		
+		Markus1, Markus2, Markus3 (etc.)
+		MArkus, MARkus, MARKus (etc.)
+		Markus!, Markus$, Markus* (etc.)
+		```
+	- GECOS
+		- passwd and shadow files are separated into GECOS fields with `:`
+	- Syntax
+		- `john --single --format=[format] [path to file]`
+
 
 ## Encryption
 - Key terms
@@ -75,4 +101,7 @@
 	- Tools to break RSA in CTFs
 		- [Resource 1](https://github.com/Ganapati/RsaCtfTool)
 		- [Resource 2](https://github.com/ius/rsatool)
-- Establishing keys using asymmetric cryptography
+- Digital Signatures and Certificates
+	- Digital certificates - prove the authencity of files
+	- Certificates - certifies different parties using public key cryptography
+	- A certificate authority (CA) holds certificates affiliated with different website domains
