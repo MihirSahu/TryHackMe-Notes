@@ -38,6 +38,7 @@ This is a list of useful tools that I can reference later.
 - [Crackstation](https://crackstation.net/)
 - [Houndsniff](https://github.com/MichaelDim02/houndsniff)
 - [hash-identifier](https://gitlab.com/kalilinux/packages/hash-identifier/-/tree/kali/master)
+- [CeWL](https://github.com/digininja/CeWL)
 
 ## Encryption
 - [RsaCtfTool](https://github.com/Ganapati/RsaCtfTool)
@@ -67,6 +68,7 @@ This is a list of useful tools that I can reference later.
 - Reaver
 - Wifite
 - Bluesnarfer
+- [TcpDump](https://www.tcpdump.org/)
 
 ## Privilege Escalation
 - LinEnum
