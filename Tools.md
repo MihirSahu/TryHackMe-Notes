@@ -11,6 +11,7 @@ This is a list of useful tools that I can reference later.
 - Netcat
 - Searchsploit
 - CyberChef
+- ImHex
 
 ## Web exploitation
 - Whatweb
