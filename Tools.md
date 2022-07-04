@@ -24,6 +24,7 @@ This is a list of useful tools that I can reference later.
 
 ## OSINT
 - Ping
+- [Hping3](https://github.com/antirez/hping)
 - Traceroute
 - Whois
 - Dig
