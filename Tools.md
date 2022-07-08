@@ -14,6 +14,7 @@ This is a list of useful tools that I can reference later.
 - ImHex
 
 ## Web exploitation
+- Wappalyzer
 - Whatweb
 - Fuff
 - Burp suite
@@ -33,6 +34,9 @@ This is a list of useful tools that I can reference later.
 - Shodan
 - Recon-ng
 - Maltego
+- who.is
+- [Sublist3r](https://github.com/aboul3la/Sublist3r)
+- hunter.io
 
 ## Hashing
 - Hashcat
