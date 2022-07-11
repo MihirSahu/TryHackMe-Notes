@@ -12,6 +12,7 @@ This is a list of useful tools that I can reference later.
 - Searchsploit
 - CyberChef
 - ImHex
+- [Exiftool](https://exiftool.org/)
 
 ## Web exploitation
 - Wappalyzer
