@@ -61,6 +61,7 @@ This is a list of useful tools that I can reference later.
 - gdbinit
 - [pwntools](https://github.com/Gallopsled/pwntools)
 - [checksec.sh](https://github.com/slimm609/checksec.sh)
+- [javascript-deobfuscator](https://github.com/ben-sb/javascript-deobfuscator)
 
 ## Steganography
 - Steghide
