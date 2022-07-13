@@ -13,6 +13,7 @@ This is a list of useful tools that I can reference later.
 - CyberChef
 - ImHex
 - [Exiftool](https://exiftool.org/)
+- [RevShells](https://github.com/0dayCTF/reverse-shell-generator)
 
 ## Web exploitation
 - Wappalyzer
@@ -62,6 +63,7 @@ This is a list of useful tools that I can reference later.
 - [pwntools](https://github.com/Gallopsled/pwntools)
 - [checksec.sh](https://github.com/slimm609/checksec.sh)
 - [javascript-deobfuscator](https://github.com/ben-sb/javascript-deobfuscator)
+- [flare-floss](https://github.com/mandiant/flare-floss)
 
 ## Steganography
 - Steghide
@@ -85,6 +87,7 @@ This is a list of useful tools that I can reference later.
 - [Upgrade simple shells to fully interactive tty](https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/)
 - [Mimikatz](https://github.com/gentilkiwi/mimikatz)
 - [PowerSploit](https://github.com/PowerShellMafia/PowerSploit)
+- [GTFObins](https://gtfobins.github.io/)
 
 ## Forensics
 - [PDFinfo](https://www.xpdfreader.com/index.html)
