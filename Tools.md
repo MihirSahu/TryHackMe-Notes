@@ -91,6 +91,7 @@ This is a list of useful tools that I can reference later.
 
 ## Forensics
 - [PDFinfo](https://www.xpdfreader.com/index.html)
+- [strace](https://github.com/strace/strace)
 
 ## SMTP
 - [smtp-user-enum](https://pentestmonkey.net/tools/user-enumeration/smtp-user-enum)
@@ -98,3 +99,6 @@ This is a list of useful tools that I can reference later.
 ## Printer Hacking
 - [Hacking Printers](http://hacking-printers.net/)
 - [PRET](https://github.com/RUB-NDS/PRET)
+
+## Misc
+- [faker](https://github.com/joke2k/faker)
